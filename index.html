@@ -149,6 +149,51 @@ function renderHole(hole) {
 
   // ...rest of your JS functions (renderHole, advanceStatOrHole, etc.)
 </script>
+function showSummary() {
+  const container = document.getElementById("hole-view");
+  let totalScore = 0;
+  let totalPar = 0;
+  let summaryHTML = `<h2>Round Summary</h2>`;
+  summaryHTML += `<p><strong>Course:</strong> ${courseName}</p>`;
+  summaryHTML += `<p><strong>Date:</strong> ${roundDate}</p>`;
+  summaryHTML += `<p><strong>Handicap:</strong> ${playerHandicap}</p>`;
+  summaryHTML += `<table border="1" cellpadding="5" style="border-collapse: collapse;">
+    <tr><th>Hole</th><th>Par</th><th>Score</th><th>Putts</th><th>GIR</th><th>Fairway</th></tr>`;
+
+  for (let i = 1; i <= totalHoles; i++) {
+    const holeData = roundData[i] || {};
+    const par = courseLayout[i] || "-";
+    const score = holeData.score ?? "-";
+    const putts = holeData.putts ?? "-";
+    const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
+    const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
+
+    if (typeof score === "number") totalScore += score;
+    if (typeof par === "number") totalPar += par;
+
+    summaryHTML += `<tr>
+      <td>${i}</td>
+      <td>${par}</td>
+      <td>${score}</td>
+      <td>${putts}</td>
+      <td>${gir}</td>
+      <td>${fairway}</td>
+    </tr>`;
+  }
+
+  const diff = totalScore - totalPar;
+  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+
+  summaryHTML += `</table><br>`;
+  summaryHTML += `<p><strong>Total Score:</strong> ${totalScore}</p>`;
+  summaryHTML += `<p><strong>Total Par:</strong> ${totalPar}</p>`;
+  summaryHTML += `<p><strong>Result:</strong> ${overUnder}</p>`;
+
+  // Placeholder for lesson generation
+  summaryHTML += `<h3>Suggested Lesson</h3><p>(Coming soon: stat-based feedback based on your handicap)</p>`;
+
+  container.innerHTML = summaryHTML;
+}
 
 </body>
 </html>
