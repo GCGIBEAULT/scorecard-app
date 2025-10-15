@@ -51,27 +51,40 @@ function startRound() {
 }
 
 
-    function renderHole(hole) {
-      const container = document.getElementById("hole-view");
-      container.innerHTML = `<h2>Hole ${hole}</h2>`;
-      selectedStats.forEach(stat => {
-        const statBlock = document.createElement("div");
-        statBlock.className = "stat-block";
-        statBlock.innerHTML = `<strong>${label(stat)}</strong><br>`;
-        const options = getOptions(stat);
-        options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.textContent = opt.label;
-          btn.onclick = () => {
-            if (!roundData[hole]) roundData[hole] = {};
-            roundData[hole][stat] = opt.value;
-            advanceStatOrHole(stat);
-          };
-          statBlock.appendChild(btn);
-        });
-        container.appendChild(statBlock);
-      });
-    }
+function renderHole(hole) {
+  const container = document.getElementById("hole-view");
+  container.innerHTML = `<h2>Hole ${hole}</h2>`;
+
+  // ✅ Add this block first, before stat buttons
+  if (!courseLayout[hole]) {
+    const parInput = document.createElement("div");
+    parInput.innerHTML = `
+      <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
+      <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" />
+      <br><br>
+    `;
+    container.appendChild(parInput);
+  }
+
+  // Then render stat buttons
+  selectedStats.forEach(stat => {
+    const statBlock = document.createElement("div");
+    statBlock.className = "stat-block";
+    statBlock.innerHTML = `<strong>${label(stat)}</strong><br>`;
+    const options = getOptions(stat);
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt.label;
+      btn.onclick = () => {
+        if (!roundData[hole]) roundData[hole] = {};
+        roundData[hole][stat] = opt.value;
+        advanceStatOrHole(stat);
+      };
+      statBlock.appendChild(btn);
+    });
+    container.appendChild(statBlock);
+  });
+}
 
     function label(stat) {
       return {
@@ -93,9 +106,27 @@ function startRound() {
     }
 
     function advanceStatOrHole(lastStat) {
-      const statsEntered = Object.keys(roundData[currentHole] || {});
-      if (stats
-<section id="hole-view"></section>
+  const statsEntered = Object.keys(roundData[currentHole] || {});
+  if (statsEntered.length === selectedStats.length) {
+    // ✅ Capture par if not already stored
+    if (!courseLayout[currentHole]) {
+      const parInput = document.getElementById(`par${currentHole}`);
+      const parValue = parseInt(parInput?.value);
+      if (parValue) {
+        courseLayout[currentHole] = parValue;
+        localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+      }
+    }
+
+    currentHole++;
+    if (currentHole <= totalHoles) {
+      renderHole(currentHole);
+    } else {
+      showSummary();
+    }
+  }
+}
+
 
 <script>
   // All your JS logic goes here
