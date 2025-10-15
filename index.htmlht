@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Modular Scorecard</title>
+  <style>
+    body { font-family: sans-serif; padding: 1em; max-width: 600px; margin: auto; }
+    .hole-row { margin-bottom: 0.5em; }
+    .hole-row strong { display: inline-block; width: 60px; }
+    input[type="number"] { width: 60px; margin-right: 10px; }
+    #stat-selector label { margin-right: 10px; }
+    #totals { margin-top: 1em; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Modular Scorecard</h1>
+
+  <section id="stat-selector">
+    <h2>Select Stats to Track</h2>
+    <label><input type="checkbox" value="score" checked /> Score</label>
+    <label><input type="checkbox" value="putts" /> Putts</label>
+    <label><input type="checkbox" value="fairway" /> Fairway Hit</label>
+  </section>
+
+  <section id="scorecard"></section>
+
+  <div id="totals"></div>
+
+  <button id="saveRound">Save Round</button>
+
+  <script>
+    function generateScorecard(stats) {
+      const container = document.getElementById("scorecard");
+      container.innerHTML = "";
+      for (let i = 1; i <= 18; i++) {
+        const row = document.createElement("div");
+        row.className = "hole-row";
+        row.innerHTML = `<strong>Hole ${i}</strong>`;
+        stats.forEach(stat => {
+          const input = document.createElement("input");
+          input.type = "number";
+          input.placeholder = stat;
+          input.dataset.hole = i;
+          input.dataset.stat = stat;
+          input.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              autoAdvance(input);
+              updateTotals();
+            }
+          });
+          input.addEventListener("input", updateTotals);
+          row.appendChild(input);
+        });
+        container.appendChild(row);
+      }
+    }
+
+    function autoAdvance(currentInput) {
+      const inputs = Array.from(document.querySelectorAll("input[type='number']"));
+      const index = inputs.indexOf(currentInput);
+      if (index >= 0 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    }
+
+    function updateTotals() {
+      const scoreInputs = document.querySelectorAll("input[data-stat='score']");
+      let front = 0, back = 0;
+      scoreInputs.forEach(input => {
+        const val = parseInt(input.value);
+        if (!isNaN(val)) {
+          const hole = parseInt(input.dataset.hole);
+          if (hole <= 9) front += val;
+          else back += val;
+        }
+      });
+      const total = front + back;
+      document.getElementById("totals").textContent =
+        `Front 9: ${front} | Back 9: ${back} | Total: ${total}`;
+    }
+
+    function saveRound() {
+      const inputs = document.querySelectorAll("input[type='number']");
+      const round = {};
+      inputs.forEach(input => {
+        const hole = input.dataset.hole;
+        const stat = input.dataset.stat;
+        const val = input.value;
+        if (!round[hole]) round[hole] = {};
+        round[hole][stat] = val;
+      });
+      const timestamp = new Date().toISOString();
+      localStorage.setItem("scorecard_round_" + timestamp, JSON.stringify(round));
+      alert("Round saved.");
+    }
+
+    document.querySelectorAll("#stat-selector input").forEach(cb => {
+      cb.addEventListener("change", () => {
+        const selected = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+        generateScorecard(selected);
+      });
+    });
+
+    document.getElementById("saveRound").addEventListener("click", saveRound);
+
+    // Initial load
+    generateScorecard(["score"]);
+  </script>
+</body>
+</html>
