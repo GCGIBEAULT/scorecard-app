@@ -211,6 +211,65 @@ function showSummary() {
 
   container.innerHTML = summaryHTML;
 }
+function showFrontNineSummary() {
+  const container = document.getElementById("hole-view");
+  let scoreSum = 0;
+  let puttsSum = 0;
+  let girHits = 0;
+  let fairwayHits = 0;
+
+  let summaryHTML = `
+    <div id="front-nine-summary">
+      <h2>Front 9 Summary</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Hole</th>
+            <th>Score</th>
+            <th>Putts</th>
+            <th>GIR</th>
+            <th>Fairway</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  for (let i = 1; i <= 9; i++) {
+    const hole = roundData[i] || {};
+    const score = hole.score ?? "-";
+    const putts = hole.putts ?? "-";
+    const gir = hole.gir === true ? "✅" : "-";
+    const fairway = hole.fairway === true ? "✅" : "-";
+
+    if (typeof score === "number") scoreSum += score;
+    if (typeof putts === "number") puttsSum += putts;
+    if (hole.gir === true) girHits++;
+    if (hole.fairway === true) fairwayHits++;
+
+    summaryHTML += `
+      <tr>
+        <td>${i}</td>
+        <td>${score}</td>
+        <td>${putts}</td>
+        <td>${gir}</td>
+        <td>${fairway}</td>
+      </tr>
+    `;
+  }
+
+  summaryHTML += `
+        </tbody>
+      </table>
+      <p><strong>Total Score:</strong> ${scoreSum}</p>
+      <p><strong>Total Putts:</strong> ${puttsSum}</p>
+      <p><strong>GIR Hits:</strong> ${girHits}</p>
+      <p><strong>Fairway Hits:</strong> ${fairwayHits}</p>
+      <button onclick="renderHole(10)">Continue to Back 9</button>
+    </div>
+  `;
+
+  container.innerHTML = summaryHTML;
+}
 
   </script>
 </body>
