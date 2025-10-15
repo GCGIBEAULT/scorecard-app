@@ -15,6 +15,13 @@
 </head>
 <body>
   <h1>Modular Scorecard</h1>
+<label for="courseName"><strong>Course Name:</strong></label>
+<input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
+<br><br>
+
+<label for="roundDate"><strong>Date:</strong></label>
+<input type="date" id="roundDate" />
+<br><br>
 
   <section id="stat-selector">
     <h2>Select Stats to Track</h2>
@@ -88,3 +95,29 @@ function startRound() {
     function advanceStatOrHole(lastStat) {
       const statsEntered = Object.keys(roundData[currentHole] || {});
       if (stats
+<section id="hole-view"></section>
+
+<script>
+  // All your JS logic goes here
+  let currentHole = 1;
+  const totalHoles = 18;
+  let selectedStats = [];
+  const roundData = {};
+  let playerHandicap = null;
+  let courseName = "";
+  let roundDate = "";
+
+  function startRound() {
+    courseName = document.getElementById("courseName").value.trim();
+    roundDate = document.getElementById("roundDate").value;
+    playerHandicap = parseInt(document.getElementById("handicap").value);
+    selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+    document.getElementById("stat-selector").style.display = "none";
+    renderHole(currentHole);
+  }
+
+  // ...rest of your JS functions (renderHole, advanceStatOrHole, etc.)
+</script>
+
+</body>
+</html>
