@@ -156,20 +156,28 @@ if (stat === "fairway") return [{ label: "Hit", value: true }];
 
 function showSummary() {
   const container = document.getElementById("hole-view");
-  let totalScore = 0;
-  let totalPar = 0;
+
+  let frontScore = 0, backScore = 0;
+  let frontPutts = 0, backPutts = 0;
+  let frontGIR = 0, backGIR = 0;
+  let frontFairway = 0, backFairway = 0;
 
   let summaryHTML = `
     <div id="summary-block">
-      <h2>Round Summary</h2>
+      <h2>Final Round Summary</h2>
       <p><strong>Course:</strong> ${courseName}</p>
       <p><strong>Date:</strong> ${roundDate}</p>
       <p><strong>Handicap:</strong> ${playerHandicap}</p>
+  `;
+
+  const buildTable = (start, end, label) => {
+    let scoreSum = 0, puttsSum = 0, girHits = 0, fairwayHits = 0;
+    let html = `
+      <h3>${label}</h3>
       <table>
         <thead>
           <tr>
             <th>Hole</th>
-            <th>Par</th>
             <th>Score</th>
             <th>Putts</th>
             <th>GIR</th>
@@ -177,47 +185,78 @@ function showSummary() {
           </tr>
         </thead>
         <tbody>
-  `;
-
-  for (let i = 1; i <= totalHoles; i++) {
-    const holeData = roundData[i] || {};
-    const par = courseLayout[i] || "-";
-    const score = holeData.score ?? "-";
-    const putts = holeData.putts ?? "-";
-    const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
-    const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
-
-    if (typeof score === "number") totalScore += score;
-    if (typeof par === "number") totalPar += par;
-
-    summaryHTML += `
-      <tr>
-        <td>${i}</td>
-        <td>${par}</td>
-        <td>${score}</td>
-        <td>${putts}</td>
-        <td>${gir}</td>
-        <td>${fairway}</td>
-      </tr>
     `;
-  }
 
-  const diff = totalScore - totalPar;
-  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+    for (let i = start; i <= end; i++) {
+      const hole = roundData[i] || {};
+      const score = hole.score ?? "-";
+      const putts = hole.putts ?? "-";
+      const gir = hole.gir === true ? "✅" : "-";
+      const fairway = hole.fairway === true ? "✅" : "-";
 
-  summaryHTML += `
+      if (typeof score === "number") scoreSum += score;
+      if (typeof putts === "number") puttsSum += putts;
+      if (hole.gir === true) girHits++;
+      if (hole.fairway === true) fairwayHits++;
+
+      html += `
+        <tr>
+          <td>${i}</td>
+          <td>${score}</td>
+          <td>${putts}</td>
+          <td>${gir}</td>
+          <td>${fairway}</td>
+        </tr>
+      `;
+    }
+
+    html += `
         </tbody>
       </table>
-      <p><strong>Total Score:</strong> ${totalScore}</p>
-      <p><strong>Total Par:</strong> ${totalPar}</p>
-      <p><strong>Result:</strong> ${overUnder}</p>
-      <h3>Suggested Lesson</h3>
-      <p>(Coming soon: stat-based feedback based on your handicap)</p>
+      <p><strong>Total Score:</strong> ${scoreSum}</p>
+      <p><strong>Total Putts:</strong> ${puttsSum}</p>
+      <p><strong>GIR Hits:</strong> ${girHits}</p>
+      <p><strong>Fairway Hits:</strong> ${fairwayHits}</p>
+    `;
+
+    // Store for final combined summary
+    if (start === 1) {
+      frontScore = scoreSum;
+      frontPutts = puttsSum;
+      frontGIR = girHits;
+      frontFairway = fairwayHits;
+    } else {
+      backScore = scoreSum;
+      backPutts = puttsSum;
+      backGIR = girHits;
+      backFairway = fairwayHits;
+    }
+
+    return html;
+  };
+
+  summaryHTML += buildTable(1, 9, "Front 9");
+  summaryHTML += buildTable(10, 18, "Back 9");
+
+  const totalScore = frontScore + backScore;
+  const totalPutts = frontPutts + backPutts;
+  const totalGIR = frontGIR + backGIR;
+  const totalFairway = frontFairway + backFairway;
+
+  summaryHTML += `
+    <h3>Full Round Totals</h3>
+    <p><strong>Total Score:</strong> ${totalScore}</p>
+    <p><strong>Total Putts:</strong> ${totalPutts}</p>
+    <p><strong>GIR Hits:</strong> ${totalGIR}</p>
+    <p><strong>Fairway Hits:</strong> ${totalFairway}</p>
+    <h3>Suggested Lesson</h3>
+    <p>(Coming soon: stat-based feedback based on your handicap)</p>
     </div>
   `;
 
   container.innerHTML = summaryHTML;
 }
+
 function showFrontNineSummary() {
   const container = document.getElementById("hole-view");
   let scoreSum = 0;
