@@ -30,6 +30,7 @@
     <br><br>
     <button onclick="startRound()">Start Round</button>
   </div>
+<div id="running-total" style="margin-bottom: 1em; font-weight: bold;"></div>
 
   <section id="hole-view"></section>
 
@@ -102,6 +103,21 @@
             localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
           }
         }
+if (currentHole >= 1) {
+  let runningScore = 0;
+  let runningPar = 0;
+
+  for (let i = 1; i <= currentHole; i++) {
+    const score = roundData[i]?.score;
+    const par = courseLayout[i];
+    if (typeof score === "number") runningScore += score;
+    if (typeof par === "number") runningPar += par;
+  }
+
+  const diff = runningScore - runningPar;
+  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+  document.getElementById("running-total").textContent = `Running Total: ${overUnder}`;
+}
 
         currentHole++;
         if (currentHole <= totalHoles) {
