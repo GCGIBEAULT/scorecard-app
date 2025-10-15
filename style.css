@@ -1,0 +1,32 @@
+body {
+  font-family: sans-serif;
+  padding: 1em;
+  max-width: 600px;
+  margin: auto;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+}
+
+.stat-block {
+  margin-bottom: 1em;
+}
+
+#hole-view {
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: 2em;
+}
+
+#hole-view table {
+  width: 100%;
+  font-size: 14px;
+  margin-top: 1em;
+}
+
+#hole-view h2 {
+  margin-top: 0;
+}
