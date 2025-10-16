@@ -112,11 +112,19 @@ function advanceStatOrHole(lastStat) {
 
   if (entered.length === stats.length) {
 if (!courseLayout[currentHole]) {
+// run this when advancing off the current hole (after user input), not at startRound()
 const parInput = document.getElementById(`par${currentHole}`);
-const parValue = parseInt(parInput?.value);
-if (!isNaN(parValue) && parValue) {
-  courseLayout[currentHole] = parValue;
-  localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+if (parInput) {
+  const raw = parInput.value.trim();
+  const parValue = parseInt(raw, 10);
+  if (!Number.isNaN(parValue) && parValue > 0) {
+    courseLayout[currentHole] = parValue;
+    localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+  } else {
+    // ensure we don't accidentally persist empty or invalid values
+    delete courseLayout[currentHole];
+    localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+  }
 }
 
 // ✅ Always save roundData, even if par wasn’t entered
