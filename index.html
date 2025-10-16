@@ -49,9 +49,9 @@
       playerHandicap = parseInt(document.getElementById("handicap").value);
       selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-      const savedLayout = localStorage.getItem(`layout_${courseName}`);
-      if (savedLayout) {
-        courseLayout = JSON.parse(savedLayout);
+localStorage.removeItem(`layout_${courseName}`);
+courseLayout = {};
+
       }
 
       document.getElementById("stat-selector").style.display = "none";
