@@ -52,7 +52,158 @@
   courseName = document.getElementById("courseName").value.trim();
   roundDate = document.getElementById("roundDate").value
     const dateInput = document.getElementById("roundDate");
-if (dateInput && dateInput.value) {
+if (dateInput && d<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scorecard App</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .hole-block { margin-top: 20px; }
+    .stat-block { margin-bottom: 10px; }
+    button.selected { background-color: #4CAF50; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Golf Scorecard</h1>
+
+  <label for="courseName"><strong>Course Name:</strong></label>
+  <input id="courseName" /><br><br>
+
+  <label for="roundDate"><strong>Date:</strong></label>
+  <input id="roundDate" type="date" /><br><br>
+
+  <label for="handicap"><strong>Handicap:</strong></label>
+  <input type="number" id="handicap" /><br><br>
+
+  <div id="stat-selector">
+    <strong>Select Stats to Track:</strong><br>
+    <label><input type="checkbox" value="score" checked /> Score</label>
+    <label><input type="checkbox" value="putts" checked /> Putts</label>
+    <label><input type="checkbox" value="gir" /> GIR</label>
+    <label><input type="checkbox" value="fairway" /> Fairway</label><br><br>
+    <button onclick="startRound()">Start Round</button>
+  </div>
+
+  <section id="hole-view"></section>
+  <div id="tracker"></div>
+
+  <script>
+    let currentHole = 1;
+    const totalHoles = 18;
+    let selectedStats = [];
+    let roundData = {};
+    let courseLayout = {};
+    let overParTracker = { front9: 0, back9: 0, total: 0 };
+    let courseName = "";
+    let roundDate = "";
+    let playerHandicap = null;
+
+    function startRound() {
+      courseName = document.getElementById("courseName")?.value?.trim() || "";
+      roundDate = document.getElementById("roundDate")?.value?.trim() || "";
+      playerHandicap = parseInt(document.getElementById("handicap")?.value, 10) || null;
+
+      selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked"))
+        .map(cb => cb.value);
+
+      const dateInput = document.getElementById("roundDate");
+      if (dateInput && dateInput.value) {
+        dateInput.blur();
+        dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+
+      if (!courseName || !roundDate || selectedStats.length === 0) {
+        document.getElementById("hole-view").innerHTML =
+          "<p style='color:red;'>Missing course name, date, or stat selection.</p>";
+        return;
+      }
+
+      if (courseName) localStorage.removeItem(`layout_${courseName}`);
+      courseLayout = {};
+      roundData = {};
+      overParTracker = { front9: 0, back9: 0, total: 0 };
+      currentHole = 1;
+
+      document.getElementById("stat-selector").style.display = "none";
+      renderHole(currentHole);
+    }
+
+    function renderHole(hole) {
+      const container = document.getElementById("hole-view");
+      container.innerHTML = ""; // ✅ Ensures clean layout
+
+      const holeBlock = document.createElement("div");
+      holeBlock.className = "hole-block";
+      holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
+
+      const parInput = document.createElement("input");
+      parInput.id = `par${hole}`;
+      parInput.type = "number";
+      parInput.placeholder = "Par";
+      parInput.style.width = "50px";
+      holeBlock.appendChild(parInput);
+
+      selectedStats.forEach(stat => {
+        const statBlock = document.createElement("div");
+        statBlock.className = "stat-block";
+        statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+        [1,2,3,4,5,6].forEach(val => {
+          const btn = document.createElement("button");
+          btn.textContent = val;
+          btn.onclick = () => {
+            if (!roundData[hole]) roundData[hole] = {}; // ✅ Prevents silent break
+            if (roundData[hole][stat] !== undefined) return;
+
+            roundData[hole][stat] = val;
+            statBlock.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+
+            advanceStatOrHole(stat);
+          };
+          statBlock.appendChild(btn);
+        });
+        holeBlock.appendChild(statBlock);
+      });
+
+      container.appendChild(holeBlock);
+    }
+
+    function advanceStatOrHole(lastStat) {
+      const stats = selectedStats;
+      const data = roundData[currentHole] || {};
+      const entered = stats.filter(stat => data[stat] !== undefined);
+
+      if (entered.length === stats.length) {
+        const par = parseInt(document.getElementById(`par${currentHole}`)?.value, 10);
+        const score = roundData[currentHole]?.[lastStat];
+
+        if (!isNaN(score) && !isNaN(par)) {
+          const over = score - par;
+          if (currentHole <= 9) overParTracker.front9 += over;
+          else overParTracker.back9 += over;
+          overParTracker.total = overParTracker.front9 + overParTracker.back9;
+          updateOverParDisplay();
+        }
+
+        currentHole++;
+        if (currentHole <= totalHoles) {
+          if (!roundData[currentHole]) roundData[currentHole] = {}; // ✅ Ensures next hole is initialized
+          renderHole(currentHole);
+        } else {
+          document.getElementById("hole-view").innerHTML = "<h2>Round Complete</h2>";
+        }
+      }
+    }
+
+    function updateOverParDisplay() {
+      document.getElementById("tracker").innerHTML =
+        `<p>Front 9: ${overParTracker.front9} | Back 9: ${overParTracker.back9} | Total: ${overParTracker.total}</p>`;
+    }
+  </script>
+</body>
+</html>
+ateInput.value) {
   dateInput.blur(); // triggers repaint
   dateInput.dispatchEvent(new Event("change", { bubbles: true }));
 }
