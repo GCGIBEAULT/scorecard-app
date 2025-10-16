@@ -46,6 +46,12 @@
    function startRound() {
   courseName = document.getElementById("courseName").value.trim();
   roundDate = document.getElementById("roundDate").value;
+  const dateInput = document.getElementById("roundDate");
+if (dateInput && dateInput.value) {
+  dateInput.blur();
+  dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+}
+   
   playerHandicap = parseInt(document.getElementById("handicap").value, 10);
   selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
