@@ -84,11 +84,19 @@ function renderHole(hole) {
     options.forEach(opt => {
       const btn = document.createElement("button");
       btn.textContent = opt.label;
-      btn.onclick = () => {
-        if (!roundData[hole]) roundData[hole] = {};
-        roundData[hole][stat] = opt.value;
-        advanceStatOrHole(stat);
-      };
+btn.onclick = () => {
+  if (!roundData[hole]) roundData[hole] = {};
+  roundData[hole][stat] = opt.value;
+
+  // Clear previous selection for this stat
+  Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
+
+  // Highlight the selected button
+  btn.classList.add("selected");
+
+  advanceStatOrHole(stat);
+};
+
       statBlock.appendChild(btn);
     });
 
