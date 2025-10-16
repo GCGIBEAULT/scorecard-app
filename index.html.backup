@@ -43,20 +43,21 @@
     let roundDate = "";
     let courseLayout = {};
 
-    function startRound() {
-      courseName = document.getElementById("courseName").value.trim();
-      roundDate = document.getElementById("roundDate").value;
-      playerHandicap = parseInt(document.getElementById("handicap").value);
-      selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+   function startRound() {
+  courseName = document.getElementById("courseName").value.trim();
+  roundDate = document.getElementById("roundDate").value;
+  playerHandicap = parseInt(document.getElementById("handicap").value, 10);
+  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-      const savedLayout = localStorage.getItem(`layout_${courseName}`);
-      if (savedLayout) {
-        courseLayout = JSON.parse(savedLayout);
-      }
+  // Wipe ghost layout and reset
+  if (courseName) localStorage.removeItem(`layout_${courseName}`);
+  courseLayout = {};
 
-      document.getElementById("stat-selector").style.display = "none";
-      renderHole(currentHole);
-    }
+  // Initialize round
+  currentHole = 1;
+  document.getElementById("stat-selector").style.display = "none";
+  renderHole(currentHole);
+}
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
@@ -66,13 +67,14 @@ function renderHole(hole) {
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
 if (hole === 1 || !courseLayout[hole]) {
-  const parInput = document.createElement("div");
-  parInput.innerHTML = `
-    <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="${courseLayout[hole] || ''}" />
-    <br><br>
-  `;
-  holeBlock.appendChild(parInput);
+const parInput = document.createElement("div");
+parInput.innerHTML = `
+  <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
+  <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="" />
+  <br><br>
+`;
+holeBlock.appendChild(parInput);
+
 }
 
   selectedStats.forEach(stat => {
