@@ -60,19 +60,40 @@
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
-
   const holeBlock = document.createElement("div");
   holeBlock.className = "hole-block";
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
-const parInput = document.createElement("div");
-parInput.innerHTML = `
-  <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-  <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="" />
-  <br><br>
-`;
-holeBlock.appendChild(parInput);
+  const parInput = document.createElement("div");
+  parInput.innerHTML = `
+    <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
+    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="" />
+    <br><br>
+  `;
+  holeBlock.appendChild(parInput);
 
+  selectedStats.forEach(stat => {
+    const statBlock = document.createElement("div");
+    statBlock.className = "stat-block";
+    statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+    const options = getOptions(stat);
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt.label;
+      btn.onclick = () => {
+        if (!roundData[hole]) roundData[hole] = {};
+        roundData[hole][stat] = opt.value;
+        Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        advanceStatOrHole(stat);
+      };
+      statBlock.appendChild(btn);
+    });
+    holeBlock.appendChild(statBlock);
+  });
+
+  container.innerHTML = "";
+  container.appendChild(holeBlock);
 }
 
   selectedStats.forEach(stat => {
