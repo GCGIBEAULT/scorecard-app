@@ -169,8 +169,9 @@ function showSummary() {
     const par = courseLayout[i] || "-";
     const Score = holeData.score ?? "-";
     const Putts = holeData.putts ?? "-";
-const GIR = holeData.gir === true ? "Hit" : "-";
-const Fairway = holeData.fairway === true ? "Hit" : "-";
+const gir = hole.gir === true ? "Hit" : "-";
+const fairway = hole.fairway === true ? "Hit" : "-";
+
 
 
     if (typeof score === "number") totalScore += score;
