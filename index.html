@@ -113,77 +113,89 @@
     }
 
     function getOptions(stat) {
-      if (stat === "score") return [{ label: "3", value: 3 }, { label: "4", value: 4 }, { label: "5", value: 5 }, { label: "6", value: 6 }, { label: "7", value: 7 }];
+if (stat === "score") return [
+  { label: "1", value: 1 },
+  { label: "2", value: 2 },
+  { label: "3", value: 3 },
+  { label: "4", value: 4 },
+  { label: "5", value: 5 },
+  { label: "6", value: 6 },
+  { label: "7", value: 7 },
+  { label: "8", value: 8 }
+];
+
       if (stat === "putts") return [{ label: "0", value: 0 }, { label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }];
-      if (stat === "gir") return [{ label: "Hit", value: true }, { label: "Miss", value: false }];
-      if (stat === "fairway") return [{ label: "Hit", value: true }, { label: "Miss", value: false }];
+if (stat === "gir") return [{ label: "Hit", value: true }];
+if (stat === "fairway") return [{ label: "Hit", value: true }];
+
       return [];
     }
 
-    function showSummary() {
-      const container = document.getElementById("hole-view");
-      let totalScore = 0;
-      let totalPar = 0;
+function showSummary() {
+  const container = document.getElementById("hole-view");
+  let totalScore = 0;
+  let totalPar = 0;
 
-      let summaryHTML = `
-        <div id="summary-block">
-          <h2>Round Summary</h2>
-          <p><strong>Course:</strong> ${courseName}</p>
-          <p><strong>Date:</strong> ${roundDate}</p>
-          <p><strong>Handicap:</strong> ${playerHandicap}</p>
-          <table>
-            <thead>
-              <tr>
-                <th>Hole</th>
-                <th>Par</th>
-                <th>Score</th>
-                <th>Putts</th>
-                <th>GIR</th>
-                <th>Fairway</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-
-      for (let i = 1; i <= totalHoles; i++) {
-        const holeData = roundData[i] || {};
-        const par = courseLayout[i] || "-";
-        const score = holeData.score ?? "-";
-        const putts = holeData.putts ?? "-";
-        const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
-        const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
-
-        if (typeof score === "number") totalScore += score;
-        if (typeof par === "number") totalPar += par;
-
-        summaryHTML += `
+  let summaryHTML = `
+    <div id="summary-block">
+      <h2>Round Summary</h2>
+      <p><strong>Course:</strong> ${courseName}</p>
+      <p><strong>Date:</strong> ${roundDate}</p>
+      <p><strong>Handicap:</strong> ${playerHandicap}</p>
+      <table>
+        <thead>
           <tr>
-            <td>${i}</td>
-            <td>${par}</td>
-            <td>${score}</td>
-            <td>${putts}</td>
-            <td>${gir}</td>
-            <td>${fairway}</td>
+            <th>Hole</th>
+            <th>Par</th>
+            <th>Score</th>
+            <th>Putts</th>
+            <th>GIR</th>
+            <th>Fairway</th>
           </tr>
-        `;
-      }
+        </thead>
+        <tbody>
+  `;
 
-      const diff = totalScore - totalPar;
-      const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+  for (let i = 1; i <= totalHoles; i++) {
+    const holeData = roundData[i] || {};
+    const par = courseLayout[i] || "-";
+    const score = holeData.score ?? "-";
+    const putts = holeData.putts ?? "-";
+    const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
+    const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
 
-      summaryHTML += `
-            </tbody>
-          </table>
-          <p><strong>Total Score:</strong> ${totalScore}</p>
-          <p><strong>Total Par:</strong> ${totalPar}</p>
-          <p><strong>Result:</strong> ${overUnder}</p>
-          <h3>Suggested Lesson</h3>
-          <p>(Coming soon: stat-based feedback based on your handicap)</p>
-        </div>
-      `;
+    if (typeof score === "number") totalScore += score;
+    if (typeof par === "number") totalPar += par;
 
-      container.innerHTML = summaryHTML;
-    }
+    summaryHTML += `
+      <tr>
+        <td>${i}</td>
+        <td>${par}</td>
+        <td>${score}</td>
+        <td>${putts}</td>
+        <td>${gir}</td>
+        <td>${fairway}</td>
+      </tr>
+    `;
+  }
+
+  const diff = totalScore - totalPar;
+  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+
+  summaryHTML += `
+        </tbody>
+      </table>
+      <p><strong>Total Score:</strong> ${totalScore}</p>
+      <p><strong>Total Par:</strong> ${totalPar}</p>
+      <p><strong>Result:</strong> ${overUnder}</p>
+      <h3>Suggested Lesson</h3>
+      <p>(Coming soon: stat-based feedback based on your handicap)</p>
+    </div>
+  `;
+
+  container.innerHTML = summaryHTML;
+}
+
   </script>
 </body>
 </html>
