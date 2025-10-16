@@ -105,71 +105,67 @@ btn.onclick = () => {
 
   container.appendChild(holeBlock);
 }
-function advanceStatOrHole(lastStat) {
-  const stats = selectedStats;
-  const data = roundData[currentHole] || {};
-  const entered = stats.filter(stat => data[stat] !== undefined);
+function advanceStatOrHole(stat) {
+  const holeData = roundData[currentHole] || {};
+  const statBlock = document.getElementById(`${stat}-block`);
+  const selectedBtn = statBlock.querySelector("button.selected");
 
-  if (entered.length === stats.length) {
-if (!courseLayout[currentHole]) {
-  const parInput = document.getElementById(`par${currentHole}`);
-  const parValue = parseInt(parInput?.value);
-  if (parValue) {
-    courseLayout[currentHole] = parValue;
-    localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+  if (selectedBtn) {
+    const value = selectedBtn.getAttribute("data-value");
+    holeData[stat] = value === "true" ? true : value === "false" ? false : parseInt(value);
+    roundData[currentHole] = holeData;
   }
-}
 
-// ✅ Always save roundData, even if par wasn’t entered
-localStorage.setItem("roundData", JSON.stringify(roundData));
-
-    // Clear container before rendering next hole
-    const container = document.getElementById("hole-view");
-    container.innerHTML = "";
-
-    currentHole++;
-    if (currentHole <= totalHoles) {
-      renderHole(currentHole);
-    } else {
-      showSummary();
+  // Save par if not already set
+  if (!courseLayout[currentHole]) {
+    const parInput = document.getElementById(`par${currentHole}`);
+    const parValue = parseInt(parInput?.value);
+    if (parValue) {
+      courseLayout[currentHole] = parValue;
+      localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
     }
   }
+
+  // Always persist roundData
+  localStorage.setItem("roundData", JSON.stringify(roundData));
+
+  // Advance to next stat or hole
+  const statIndex = selectedStats.indexOf(stat);
+  if (statIndex < selectedStats.length - 1) {
+    renderStat(selectedStats[statIndex + 1]);
+  } else {
+    currentHole++;
+
+    // Front 9 summary
+    if (currentHole === 10) {
+      showSummary("front9");
+      const continueBtn = document.createElement("button");
+      continueBtn.textContent = "Continue to Back 9";
+      continueBtn.onclick = () => renderHole(currentHole);
+      document.getElementById("hole-view").appendChild(continueBtn);
+      return;
+    }
+
+    // End of round
+    if (currentHole > totalHoles) {
+      showSummary("front9");
+      showSummary("back9");
+      showSummary("full");
+
+      const fileBtn = document.createElement("button");
+      fileBtn.textContent = "File Round";
+      fileBtn.onclick = () => {
+        alert("Round filed.");
+        // Optional: archive logic here
+      };
+      document.getElementById("hole-view").appendChild(fileBtn);
+      return;
+    }
+
+    renderHole(currentHole);
+  }
 }
 
-
-
-  function getOptions(stat) {
-  if (stat === "score") return [
-    { label: "1", value: 1 },
-    { label: "2", value: 2 },
-    { label: "3", value: 3 },
-    { label: "4", value: 4 },
-    { label: "5", value: 5 },
-    { label: "6", value: 6 },
-    { label: "7", value: 7 },
-    { label: "8", value: 8 }
-  ];
-  if (stat === "putts") return [
-    { label: "0", value: 0 },
-    { label: "1", value: 1 },
-    { label: "2", value: 2 },
-    { label: "3", value: 3 }
-  ];
-if (stat === "gir") return [
-  { label: "Hit", value: true },
-  { label: "X", value: false }
-];
-
-if (stat === "fairway") return [
-  { label: "Hit", value: true },
-  { label: "X", value: false }
-];
-
-
-
-return [];
-
-}
 
 
 function showSummary() {
