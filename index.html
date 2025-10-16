@@ -194,6 +194,80 @@ function showSummary() {
 
   container.innerHTML = summaryHTML;
 }
+<script>
+  let currentHole = 1;
+  const totalHoles = 18;
+  let selectedStats = [];
+  const roundData = {};
+  let playerHandicap = null;
+  let courseName = "";
+  let roundDate = "";
+  let courseLayout = {};
+
+  function startRound() {
+    courseName = document.getElementById("courseName").value.trim();
+    roundDate = document.getElementById("roundDate").value;
+    playerHandicap = parseInt(document.getElementById("handicap").value);
+    selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+
+    const savedLayout = localStorage.getItem(`layout_${courseName}`);
+    if (savedLayout) {
+      courseLayout = JSON.parse(savedLayout);
+    }
+
+    document.getElementById("stat-selector").style.display = "none";
+    renderHole(currentHole);
+  }
+
+  function renderHole(hole) {
+    const container = document.getElementById("hole-view");
+    container.innerHTML = `<h2>Hole ${hole}</h2>`;
+
+    if (!courseLayout[hole]) {
+      const parInput = document.createElement("div");
+      parInput.innerHTML = `
+        <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
+        <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" />
+        <br><br>
+      `;
+      container.appendChild(parInput);
+    }
+
+    selectedStats.forEach(stat => {
+      const statBlock = document.createElement("div");
+      statBlock.className = "stat-block";
+      statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+      const options = getOptions(stat);
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt.label;
+        btn.onclick = () => {
+          if (!roundData[hole]) roundData[hole] = {};
+          roundData[hole][stat] = opt.value;
+          advanceStatOrHole(stat);
+        };
+        statBlock.appendChild(btn);
+      });
+      container.appendChild(statBlock);
+    });
+  }
+
+  function advanceStatOrHole(lastStat) {
+    const statsEntered = Object.keys(roundData[currentHole] || {});
+    if (statsEntered.length === selectedStats.length) {
+      if (!courseLayout[currentHole]) {
+        const parInput = document.getElementById(`par${currentHole}`);
+        const parValue = parseInt(parInput?.value);
+        if (parValue) {
+          courseLayout[currentHole] = parValue;
+          localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+        }
+      }
+
+      currentHole++;
+      if (currentHole <= totalHoles) {
+        renderHole(currentHole);
+      } else {
 
 </body>
 </html>
