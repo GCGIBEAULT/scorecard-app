@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scorecard App</title>
+  <title>Scorecard App</title>paj
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -69,7 +69,7 @@ if (hole === 1 || !courseLayout[hole]) {
   const parInput = document.createElement("div");
   parInput.innerHTML = `
     <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="${courseLayout[hole] !== undefined ? courseLayout[hole] : ''}" />
+<input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="" />
 
     <br><br>
   `;
