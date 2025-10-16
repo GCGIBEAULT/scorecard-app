@@ -199,8 +199,9 @@ function showSummary() {
     const par = courseLayout[i] || "-";
     const Score = holeData.score ?? "-";
     const Putts = holeData.putts ?? "-";
-const gir = holeData.gir === true ? "Hit" : "-";
-const fairway = holeData.fairway === true ? "Hit" : "-";
+const gir = `<button class="stat-btn${holeData.gir === true ? ' selected' : ''}">${holeData.gir === true ? 'Hit' : 'X'}</button>`;
+const fairway = `<button class="stat-btn${holeData.fairway === true ? ' selected' : ''}">${holeData.fairway === true ? 'Hit' : 'X'}</button>`;
+
 
 
 
