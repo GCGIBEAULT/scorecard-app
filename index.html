@@ -15,6 +15,13 @@
 </head>
 <body>
   <h1>Modular Scorecard</h1>
+<label for="courseName"><strong>Course Name:</strong></label>
+<input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
+<br><br>
+
+<label for="roundDate"><strong>Date:</strong></label>
+<input type="date" id="roundDate" />
+<br><br>
 
   <section id="stat-selector">
     <h2>Select Stats to Track</h2>
@@ -44,27 +51,40 @@ function startRound() {
 }
 
 
-    function renderHole(hole) {
-      const container = document.getElementById("hole-view");
-      container.innerHTML = `<h2>Hole ${hole}</h2>`;
-      selectedStats.forEach(stat => {
-        const statBlock = document.createElement("div");
-        statBlock.className = "stat-block";
-        statBlock.innerHTML = `<strong>${label(stat)}</strong><br>`;
-        const options = getOptions(stat);
-        options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.textContent = opt.label;
-          btn.onclick = () => {
-            if (!roundData[hole]) roundData[hole] = {};
-            roundData[hole][stat] = opt.value;
-            advanceStatOrHole(stat);
-          };
-          statBlock.appendChild(btn);
-        });
-        container.appendChild(statBlock);
-      });
-    }
+function renderHole(hole) {
+  const container = document.getElementById("hole-view");
+  container.innerHTML = `<h2>Hole ${hole}</h2>`;
+
+  // ✅ Add this block first, before stat buttons
+  if (!courseLayout[hole]) {
+    const parInput = document.createElement("div");
+    parInput.innerHTML = `
+      <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
+      <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" />
+      <br><br>
+    `;
+    container.appendChild(parInput);
+  }
+
+  // Then render stat buttons
+  selectedStats.forEach(stat => {
+    const statBlock = document.createElement("div");
+    statBlock.className = "stat-block";
+    statBlock.innerHTML = `<strong>${label(stat)}</strong><br>`;
+    const options = getOptions(stat);
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt.label;
+      btn.onclick = () => {
+        if (!roundData[hole]) roundData[hole] = {};
+        roundData[hole][stat] = opt.value;
+        advanceStatOrHole(stat);
+      };
+      statBlock.appendChild(btn);
+    });
+    container.appendChild(statBlock);
+  });
+}
 
     function label(stat) {
       return {
@@ -86,5 +106,94 @@ function startRound() {
     }
 
     function advanceStatOrHole(lastStat) {
-      const statsEntered = Object.keys(roundData[currentHole] || {});
-      if (stats
+  const statsEntered = Object.keys(roundData[currentHole] || {});
+  if (statsEntered.length === selectedStats.length) {
+    // ✅ Capture par if not already stored
+    if (!courseLayout[currentHole]) {
+      const parInput = document.getElementById(`par${currentHole}`);
+      const parValue = parseInt(parInput?.value);
+      if (parValue) {
+        courseLayout[currentHole] = parValue;
+        localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+      }
+    }
+
+    currentHole++;
+    if (currentHole <= totalHoles) {
+      renderHole(currentHole);
+    } else {
+      showSummary();
+    }
+  }
+}
+
+
+<script>
+  // All your JS logic goes here
+  let currentHole = 1;
+  const totalHoles = 18;
+  let selectedStats = [];
+  const roundData = {};
+  let playerHandicap = null;
+  let courseName = "";
+  let roundDate = "";
+
+  function startRound() {
+    courseName = document.getElementById("courseName").value.trim();
+    roundDate = document.getElementById("roundDate").value;
+    playerHandicap = parseInt(document.getElementById("handicap").value);
+    selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+    document.getElementById("stat-selector").style.display = "none";
+    renderHole(currentHole);
+  }
+
+  // ...rest of your JS functions (renderHole, advanceStatOrHole, etc.)
+</script>
+function showSummary() {
+  const container = document.getElementById("hole-view");
+  let totalScore = 0;
+  let totalPar = 0;
+  let summaryHTML = `<h2>Round Summary</h2>`;
+  summaryHTML += `<p><strong>Course:</strong> ${courseName}</p>`;
+  summaryHTML += `<p><strong>Date:</strong> ${roundDate}</p>`;
+  summaryHTML += `<p><strong>Handicap:</strong> ${playerHandicap}</p>`;
+  summaryHTML += `<table border="1" cellpadding="5" style="border-collapse: collapse;">
+    <tr><th>Hole</th><th>Par</th><th>Score</th><th>Putts</th><th>GIR</th><th>Fairway</th></tr>`;
+
+  for (let i = 1; i <= totalHoles; i++) {
+    const holeData = roundData[i] || {};
+    const par = courseLayout[i] || "-";
+    const score = holeData.score ?? "-";
+    const putts = holeData.putts ?? "-";
+    const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
+    const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
+
+    if (typeof score === "number") totalScore += score;
+    if (typeof par === "number") totalPar += par;
+
+    summaryHTML += `<tr>
+      <td>${i}</td>
+      <td>${par}</td>
+      <td>${score}</td>
+      <td>${putts}</td>
+      <td>${gir}</td>
+      <td>${fairway}</td>
+    </tr>`;
+  }
+
+  const diff = totalScore - totalPar;
+  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+
+  summaryHTML += `</table><br>`;
+  summaryHTML += `<p><strong>Total Score:</strong> ${totalScore}</p>`;
+  summaryHTML += `<p><strong>Total Par:</strong> ${totalPar}</p>`;
+  summaryHTML += `<p><strong>Result:</strong> ${overUnder}</p>`;
+
+  // Placeholder for lesson generation
+  summaryHTML += `<h3>Suggested Lesson</h3><p>(Coming soon: stat-based feedback based on your handicap)</p>`;
+
+  container.innerHTML = summaryHTML;
+}
+
+</body>
+</html>
