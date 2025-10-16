@@ -43,64 +43,65 @@
     let roundDate = "";
     let courseLayout = {};
 
-function startRound() {
-  courseName = document.getElementById("courseName").value.trim();
-  roundDate = document.getElementById("roundDate").value;
-  playerHandicap = parseInt(document.getElementById("handicap").value, 10);
-  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+    function startRound() {
+      courseName = document.getElementById("courseName").value.trim();
+      roundDate = document.getElementById("roundDate").value;
+      playerHandicap = parseInt(document.getElementById("handicap").value);
+      selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-  // Ensure a fresh round; remove stale saved layout so par inputs start blank
-  if (courseName) {
-    localStorage.removeItem(`layout_${courseName}`);
-  }
-  courseLayout = {};
+      const savedLayout = localStorage.getItem(`layout_${courseName}`);
+      if (savedLayout) {
+        courseLayout = JSON.parse(savedLayout);
+      }
 
-  document.getElementById("stat-selector").style.display = "none";
-  currentHole = 1;
-  renderHole(currentHole);
-}
+      document.getElementById("stat-selector").style.display = "none";
+      renderHole(currentHole);
+    }
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
+
   const holeBlock = document.createElement("div");
   holeBlock.className = "hole-block";
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
-  // Always render the par input for every hole; id contains no spaces
+if (hole === 1 || !courseLayout[hole]) {
   const parInput = document.createElement("div");
   parInput.innerHTML = `
     <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="" />
+    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="${courseLayout[hole] || ''}" />
     <br><br>
   `;
   holeBlock.appendChild(parInput);
+}
 
   selectedStats.forEach(stat => {
     const statBlock = document.createElement("div");
     statBlock.className = "stat-block";
     statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+
     const options = getOptions(stat);
     options.forEach(opt => {
       const btn = document.createElement("button");
       btn.textContent = opt.label;
-      btn.onclick = () => {
-        if (!roundData[hole]) roundData[hole] = {};
-        roundData[hole][stat] = opt.value;
-        Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
+btn.onclick = () => {
+  if (!roundData[hole]) roundData[hole] = {};
+  roundData[hole][stat] = opt.value;
 
-        // Save par only when advancing off the current hole (handled elsewhere)
-        advanceStatOrHole(stat);
-      };
+  // Clear previous selection for this stat
+  Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
+
+  // Highlight the selected button
+  btn.classList.add("selected");
+
+  advanceStatOrHole(stat);
+};
+
       statBlock.appendChild(btn);
     });
+
     holeBlock.appendChild(statBlock);
   });
-
-  // replace container contents with the new hole block
-  container.innerHTML = "";
-  container.appendChild(holeBlock);
-}
 
   container.appendChild(holeBlock);
 }
@@ -111,17 +112,10 @@ function advanceStatOrHole(lastStat) {
 
   if (entered.length === stats.length) {
 if (!courseLayout[currentHole]) {
-// run this when advancing off the current hole (after user input), not at startRound()
-const parInput = document.getElementById(`par${currentHole}`);
-if (parInput) {
-  const raw = parInput.value.trim();
-  const parValue = parseInt(raw, 10);
-  if (!Number.isNaN(parValue) && parValue > 0) {
+  const parInput = document.getElementById(`par${currentHole}`);
+  const parValue = parseInt(parInput?.value);
+  if (parValue) {
     courseLayout[currentHole] = parValue;
-    localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
-  } else {
-    // ensure we don't accidentally persist empty or invalid values
-    delete courseLayout[currentHole];
     localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
   }
 }
