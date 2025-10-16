@@ -311,16 +311,8 @@ function showLesson(stat) {
       "Club Selection",
       "Follow Through Finish"
     ];
-  } else if (stat === "chip") {
-    lessons = [
-      "Landing Spot Visualization",
-      "One-Club Chipping",
-      "Low vs High Chips",
-      "Backswing Length Control",
-      "Bounce vs Dig",
-      "Short Game Tempo"
-    ];
-  }
+} else if (stat === "chip") { lessons = ["Landing Spot Visualization","One-Club Chipping","Low vs High Chips","Backswing Length Control","Bounce vs Dig","Short Game Tempo"]; }
+
 
   drawer.innerHTML = `
     <h4>${stat.toUpperCase()} Lessons</h4>
