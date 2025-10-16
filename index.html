@@ -69,7 +69,8 @@ if (hole === 1 || !courseLayout[hole]) {
   const parInput = document.createElement("div");
   parInput.innerHTML = `
     <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="${courseLayout[hole] || ''}" />
+    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="${courseLayout[hole] !== undefined ? courseLayout[hole] : ''}" />
+
     <br><br>
   `;
   holeBlock.appendChild(parInput);
