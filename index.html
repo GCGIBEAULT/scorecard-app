@@ -259,66 +259,10 @@ summaryHTML += `
   <p><strong>GIR Hits:</strong> ${totalGIR}</p>
   <p><strong>Fairway Hits:</strong> ${totalFairway}</p>
 
-  <h3>Improve Your Game</h3>
-  <div id="lesson-icons">
-    <button onclick="showLesson('putts')">🟢 Putts</button>
-    <button onclick="showLesson('gir')">🔵 GIR</button>
-    <button onclick="showLesson('fairway')">🟠 Fairways</button>
-    <button onclick="showLesson('sand')">🟤 Sand Play</button>
-    <button onclick="showLesson('chip')">🟣 Chipping</button>
-  </div>
-  <div id="lesson-drawer"></div>
+ 
 `;
 container.innerHTML = summaryHTML;
-function showLesson(stat) {
 
-  const drawer = document.getElementById("lesson-drawer");
-  let lessons = [];
-
-  if (stat === "putts") {
-    lessons = [
-      "Gate Drill for Alignment",
-      "Lag Putting Distance Control",
-      "Wrist Action Fixes",
-      "Green Reading Basics",
-      "Tempo and Rhythm",
-      "Short Putt Confidence"
-    ];
-  } else if (stat === "gir") {
-    lessons = [
-      "Approach Shot Setup",
-      "Club Selection Strategy",
-      "Tempo for Mid Irons",
-      "Par-3 Precision",
-      "Target Visualization",
-      "Avoiding Short-Side Misses"
-    ];
-  } else if (stat === "fairway") {
-    lessons = [
-      "Tee Height and Setup",
-      "Driver Tempo Drill",
-      "Fairway Wood Accuracy",
-      "Grip Pressure Fixes",
-      "Alignment Check",
-      "Ball Position for Launch"
-    ];
-  } else if (stat === "sand") {
-    lessons = [
-      "Open Face Setup",
-      "Splash Drill",
-      "Low vs High Bunker Shots",
-      "Weight Shift in Sand",
-      "Club Selection",
-      "Follow Through Finish"
-    ];
-} else if (stat === "chip") { lessons = ["Landing Spot Visualization","One-Club Chipping","Low vs High Chips","Backswing Length Control","Bounce vs Dig","Short Game Tempo"]; }
-
-
-  drawer.innerHTML = `
-    <h4>${stat.toUpperCase()} Lessons</h4>
-    <ul>${lessons.map(l => `<li>${l}</li>`).join("")}</ul>
-  `;
-}
 
 function showFrontNineSummary() {
   const container = document.getElementById("hole-view");
