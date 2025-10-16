@@ -47,7 +47,7 @@
     let courseLayout = {};
 
 function startRound() {
-
+console.log("✅ startRound() triggered");
   courseName = document.getElementById("courseName").value.trim();
   roundDate = document.getElementById("roundDate").value;
   playerHandicap = parseInt(document.getElementById("handicap").value);
@@ -326,10 +326,8 @@ function showFrontNineSummary() {
 
   </script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("start-button").addEventListener("click", startRound);
-  });
+  document.getElementById("start-button").addEventListener("click", startRound);
 </script>
-
 </body>
 </html>
+
