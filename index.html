@@ -97,26 +97,23 @@ function renderHole(hole) {
 
   container.appendChild(holeBlock);
 }
-    function advanceStatOrHole(lastStat) {
-      const statsEntered = Object.keys(roundData[currentHole] || {});
-      if (statsEntered.length === selectedStats.length) {
-        if (!courseLayout[currentHole]) {
-          const parInput = document.getElementById(`par${currentHole}`);
-          const parValue = parseInt(parInput?.value);
-          if (parValue) {
-            courseLayout[currentHole] = parValue;
-            localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
-          }
-        }
-
-        currentHole++;
-        if (currentHole <= totalHoles) {
-          renderHole(currentHole);
-        } else {
-          showSummary();
-        }
-      }
+function advanceStatOrHole(lastStat) {
+  if (!courseLayout[currentHole]) {
+    const parInput = document.getElementById(`par${currentHole}`);
+    const parValue = parseInt(parInput?.value);
+    if (parValue) {
+      courseLayout[currentHole] = parValue;
+      localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
     }
+  }
+  currentHole++;
+  if (currentHole <= totalHoles) {
+    renderHole(currentHole);
+  } else {
+    showSummary();
+  }
+}
+
 
   function getOptions(stat) {
   if (stat === "score") return [
