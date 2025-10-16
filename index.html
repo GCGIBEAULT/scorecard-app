@@ -167,10 +167,11 @@ function showSummary() {
   for (let i = 1; i <= totalHoles; i++) {
     const holeData = roundData[i] || {};
     const par = courseLayout[i] || "-";
-    const score = holeData.score ?? "-";
-    const putts = holeData.putts ?? "-";
-    const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
-    const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
+    const Score = holeData.score ?? "-";
+    const Putts = holeData.putts ?? "-";
+const GIR = holeData.gir === true ? "Hit" : "-";
+const Fairway = holeData.fairway === true ? "Hit" : "-";
+
 
     if (typeof score === "number") totalScore += score;
     if (typeof par === "number") totalPar += par;
