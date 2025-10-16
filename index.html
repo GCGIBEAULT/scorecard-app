@@ -2,36 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Modular Scorecard</title>
-      <label for="handicap"><strong>Your Handicap:</strong></label>
-<input type="number" id="handicap" min="0" max="54" style="width: 60px; margin-left: 10px;" />
-<br><br>
-  <style>
-    body { font-family: sans-serif; padding: 1em; max-width: 600px; margin: auto; }
-    button { margin: 5px; padding: 10px 15px; font-size: 16px; }
-    .stat-block { margin-bottom: 1em; }
-    #hole-view h2 { margin-bottom: 0.5em; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scorecard App</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Modular Scorecard</h1>
-<label for="courseName"><strong>Course Name:</strong></label>
-<input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
-<br><br>
+  <h1>Start Your Round</h1>
 
-<label for="roundDate"><strong>Date:</strong></label>
-<input type="date" id="roundDate" />
-<br><br>
+  <label for="courseName"><strong>Course Name:</strong></label>
+  <input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
+  <br><br>
 
-  <section id="stat-selector">
-    <h2>Select Stats to Track</h2>
+  <label for="roundDate"><strong>Date:</strong></label>
+  <input type="date" id="roundDate" />
+  <br><br>
+
+  <label for="handicap"><strong>Handicap:</strong></label>
+  <input type="number" id="handicap" />
+  <br><br>
+
+  <div id="stat-selector">
+    <strong>Select Stats to Track:</strong><br>
     <label><input type="checkbox" value="score" checked /> Score</label>
     <label><input type="checkbox" value="putts" checked /> Putts</label>
-    <label><input type="checkbox" value="gir" checked /> Greens in Regulation</label>
-    <label><input type="checkbox" value="fairway" checked /> Fairways Hit</label>
+    <label><input type="checkbox" value="gir" checked /> GIR</label>
+    <label><input type="checkbox" value="fairway" checked /> Fairway</label>
     <br><br>
     <button onclick="startRound()">Start Round</button>
-  </section>
+  </div>
 
   <section id="hole-view"></section>
 
@@ -40,234 +38,152 @@
     const totalHoles = 18;
     let selectedStats = [];
     const roundData = {};
+    let playerHandicap = null;
+    let courseName = "";
+    let roundDate = "";
+    let courseLayout = {};
 
-let playerHandicap = null;
+    function startRound() {
+      courseName = document.getElementById("courseName").value.trim();
+      roundDate = document.getElementById("roundDate").value;
+      playerHandicap = parseInt(document.getElementById("handicap").value);
+      selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-function startRound() {
-  playerHandicap = parseInt(document.getElementById("handicap").value);
-  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
-  document.getElementById("stat-selector").style.display = "none";
-  renderHole(currentHole);
-}
+      const savedLayout = localStorage.getItem(`layout_${courseName}`);
+      if (savedLayout) {
+        courseLayout = JSON.parse(savedLayout);
+      }
 
-
-function renderHole(hole) {
-  const container = document.getElementById("hole-view");
-  container.innerHTML = `<h2>Hole ${hole}</h2>`;
-
-  // ✅ Add this block first, before stat buttons
-  if (!courseLayout[hole]) {
-    const parInput = document.createElement("div");
-    parInput.innerHTML = `
-      <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-      <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" />
-      <br><br>
-    `;
-    container.appendChild(parInput);
-  }
-
-  // Then render stat buttons
-  selectedStats.forEach(stat => {
-    const statBlock = document.createElement("div");
-    statBlock.className = "stat-block";
-    statBlock.innerHTML = `<strong>${label(stat)}</strong><br>`;
-    const options = getOptions(stat);
-    options.forEach(opt => {
-      const btn = document.createElement("button");
-      btn.textContent = opt.label;
-      btn.onclick = () => {
-        if (!roundData[hole]) roundData[hole] = {};
-        roundData[hole][stat] = opt.value;
-        advanceStatOrHole(stat);
-      };
-      statBlock.appendChild(btn);
-    });
-    container.appendChild(statBlock);
-  });
-}
-
-    function label(stat) {
-      return {
-        score: "Score",
-        putts: "Putts",
-        gir: "Greens in Regulation",
-        fairway: "Fairways Hit"
-      }[stat];
+      document.getElementById("stat-selector").style.display = "none";
+      renderHole(currentHole);
     }
 
-    function getOptions(stat) {
-      if (stat === "score") return Array.from({length: 8}, (_, i) => ({ label: i+1, value: i+1 }));
-      if (stat === "putts") return Array.from({length: 5}, (_, i) => ({ label: i, value: i }));
-      if (stat === "gir" || stat === "fairway") return [
-        { label: "✅ Yes", value: true },
-        { label: "❌ No", value: false }
-      ];
-      return [];
+    function renderHole(hole) {
+      const container = document.getElementById("hole-view");
+      container.innerHTML = `<h2>Hole ${hole}</h2>`;
+
+      if (!courseLayout[hole]) {
+        const parInput = document.createElement("div");
+        parInput.innerHTML = `
+          <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
+          <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" />
+          <br><br>
+        `;
+        container.appendChild(parInput);
+      }
+
+      selectedStats.forEach(stat => {
+        const statBlock = document.createElement("div");
+        statBlock.className = "stat-block";
+        statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+        const options = getOptions(stat);
+        options.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.textContent = opt.label;
+          btn.onclick = () => {
+            if (!roundData[hole]) roundData[hole] = {};
+            roundData[hole][stat] = opt.value;
+            advanceStatOrHole(stat);
+          };
+          statBlock.appendChild(btn);
+        });
+        container.appendChild(statBlock);
+      });
     }
 
     function advanceStatOrHole(lastStat) {
-  const statsEntered = Object.keys(roundData[currentHole] || {});
-  if (statsEntered.length === selectedStats.length) {
-    // ✅ Capture par if not already stored
-    if (!courseLayout[currentHole]) {
-      const parInput = document.getElementById(`par${currentHole}`);
-      const parValue = parseInt(parInput?.value);
-      if (parValue) {
-        courseLayout[currentHole] = parValue;
-        localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
-      }
-    }
+      const statsEntered = Object.keys(roundData[currentHole] || {});
+      if (statsEntered.length === selectedStats.length) {
+        if (!courseLayout[currentHole]) {
+          const parInput = document.getElementById(`par${currentHole}`);
+          const parValue = parseInt(parInput?.value);
+          if (parValue) {
+            courseLayout[currentHole] = parValue;
+            localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+          }
+        }
 
-    currentHole++;
-    if (currentHole <= totalHoles) {
-      renderHole(currentHole);
-    } else {
-      showSummary();
-    }
-  }
-}
-
-
-<script>
-  // All your JS logic goes here
-  let currentHole = 1;
-  const totalHoles = 18;
-  let selectedStats = [];
-  const roundData = {};
-  let playerHandicap = null;
-  let courseName = "";
-  let roundDate = "";
-
-  function startRound() {
-    courseName = document.getElementById("courseName").value.trim();
-    roundDate = document.getElementById("roundDate").value;
-    playerHandicap = parseInt(document.getElementById("handicap").value);
-    selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
-    document.getElementById("stat-selector").style.display = "none";
-    renderHole(currentHole);
-  }
-
-  // ...rest of your JS functions (renderHole, advanceStatOrHole, etc.)
-</script>
-function showSummary() {
-  const container = document.getElementById("hole-view");
-  let totalScore = 0;
-  let totalPar = 0;
-  let summaryHTML = `<h2>Round Summary</h2>`;
-  summaryHTML += `<p><strong>Course:</strong> ${courseName}</p>`;
-  summaryHTML += `<p><strong>Date:</strong> ${roundDate}</p>`;
-  summaryHTML += `<p><strong>Handicap:</strong> ${playerHandicap}</p>`;
-  summaryHTML += `<table border="1" cellpadding="5" style="border-collapse: collapse;">
-    <tr><th>Hole</th><th>Par</th><th>Score</th><th>Putts</th><th>GIR</th><th>Fairway</th></tr>`;
-
-  for (let i = 1; i <= totalHoles; i++) {
-    const holeData = roundData[i] || {};
-    const par = courseLayout[i] || "-";
-    const score = holeData.score ?? "-";
-    const putts = holeData.putts ?? "-";
-    const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
-    const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
-
-    if (typeof score === "number") totalScore += score;
-    if (typeof par === "number") totalPar += par;
-
-    summaryHTML += `<tr>
-      <td>${i}</td>
-      <td>${par}</td>
-      <td>${score}</td>
-      <td>${putts}</td>
-      <td>${gir}</td>
-      <td>${fairway}</td>
-    </tr>`;
-  }
-
-  const diff = totalScore - totalPar;
-  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
-
-  summaryHTML += `</table><br>`;
-  summaryHTML += `<p><strong>Total Score:</strong> ${totalScore}</p>`;
-  summaryHTML += `<p><strong>Total Par:</strong> ${totalPar}</p>`;
-  summaryHTML += `<p><strong>Result:</strong> ${overUnder}</p>`;
-
-  // Placeholder for lesson generation
-  summaryHTML += `<h3>Suggested Lesson</h3><p>(Coming soon: stat-based feedback based on your handicap)</p>`;
-
-  container.innerHTML = summaryHTML;
-}
-<script>
-  let currentHole = 1;
-  const totalHoles = 18;
-  let selectedStats = [];
-  const roundData = {};
-  let playerHandicap = null;
-  let courseName = "";
-  let roundDate = "";
-  let courseLayout = {};
-
-  function startRound() {
-    courseName = document.getElementById("courseName").value.trim();
-    roundDate = document.getElementById("roundDate").value;
-    playerHandicap = parseInt(document.getElementById("handicap").value);
-    selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
-
-    const savedLayout = localStorage.getItem(`layout_${courseName}`);
-    if (savedLayout) {
-      courseLayout = JSON.parse(savedLayout);
-    }
-
-    document.getElementById("stat-selector").style.display = "none";
-    renderHole(currentHole);
-  }
-
-  function renderHole(hole) {
-    const container = document.getElementById("hole-view");
-    container.innerHTML = `<h2>Hole ${hole}</h2>`;
-
-    if (!courseLayout[hole]) {
-      const parInput = document.createElement("div");
-      parInput.innerHTML = `
-        <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-        <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" />
-        <br><br>
-      `;
-      container.appendChild(parInput);
-    }
-
-    selectedStats.forEach(stat => {
-      const statBlock = document.createElement("div");
-      statBlock.className = "stat-block";
-      statBlock.innerHTML = `<strong>${stat}</strong><br>`;
-      const options = getOptions(stat);
-      options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.textContent = opt.label;
-        btn.onclick = () => {
-          if (!roundData[hole]) roundData[hole] = {};
-          roundData[hole][stat] = opt.value;
-          advanceStatOrHole(stat);
-        };
-        statBlock.appendChild(btn);
-      });
-      container.appendChild(statBlock);
-    });
-  }
-
-  function advanceStatOrHole(lastStat) {
-    const statsEntered = Object.keys(roundData[currentHole] || {});
-    if (statsEntered.length === selectedStats.length) {
-      if (!courseLayout[currentHole]) {
-        const parInput = document.getElementById(`par${currentHole}`);
-        const parValue = parseInt(parInput?.value);
-        if (parValue) {
-          courseLayout[currentHole] = parValue;
-          localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+        currentHole++;
+        if (currentHole <= totalHoles) {
+          renderHole(currentHole);
+        } else {
+          showSummary();
         }
       }
+    }
 
-      currentHole++;
-      if (currentHole <= totalHoles) {
-        renderHole(currentHole);
-      } else {
+    function getOptions(stat) {
+      if (stat === "score") return [{ label: "3", value: 3 }, { label: "4", value: 4 }, { label: "5", value: 5 }, { label: "6", value: 6 }, { label: "7", value: 7 }];
+      if (stat === "putts") return [{ label: "0", value: 0 }, { label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }];
+      if (stat === "gir") return [{ label: "Hit", value: true }, { label: "Miss", value: false }];
+      if (stat === "fairway") return [{ label: "Hit", value: true }, { label: "Miss", value: false }];
+      return [];
+    }
 
+    function showSummary() {
+      const container = document.getElementById("hole-view");
+      let totalScore = 0;
+      let totalPar = 0;
+
+      let summaryHTML = `
+        <div id="summary-block">
+          <h2>Round Summary</h2>
+          <p><strong>Course:</strong> ${courseName}</p>
+          <p><strong>Date:</strong> ${roundDate}</p>
+          <p><strong>Handicap:</strong> ${playerHandicap}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Hole</th>
+                <th>Par</th>
+                <th>Score</th>
+                <th>Putts</th>
+                <th>GIR</th>
+                <th>Fairway</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      for (let i = 1; i <= totalHoles; i++) {
+        const holeData = roundData[i] || {};
+        const par = courseLayout[i] || "-";
+        const score = holeData.score ?? "-";
+        const putts = holeData.putts ?? "-";
+        const gir = holeData.gir === true ? "✅" : holeData.gir === false ? "❌" : "-";
+        const fairway = holeData.fairway === true ? "✅" : holeData.fairway === false ? "❌" : "-";
+
+        if (typeof score === "number") totalScore += score;
+        if (typeof par === "number") totalPar += par;
+
+        summaryHTML += `
+          <tr>
+            <td>${i}</td>
+            <td>${par}</td>
+            <td>${score}</td>
+            <td>${putts}</td>
+            <td>${gir}</td>
+            <td>${fairway}</td>
+          </tr>
+        `;
+      }
+
+      const diff = totalScore - totalPar;
+      const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+
+      summaryHTML += `
+            </tbody>
+          </table>
+          <p><strong>Total Score:</strong> ${totalScore}</p>
+          <p><strong>Total Par:</strong> ${totalPar}</p>
+          <p><strong>Result:</strong> ${overUnder}</p>
+          <h3>Suggested Lesson</h3>
+          <p>(Coming soon: stat-based feedback based on your handicap)</p>
+        </div>
+      `;
+
+      container.innerHTML = summaryHTML;
+    }
+  </script>
 </body>
 </html>
