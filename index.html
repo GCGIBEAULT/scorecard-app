@@ -105,69 +105,71 @@ btn.onclick = () => {
 
   container.appendChild(holeBlock);
 }
-function advanceStatOrHole(stat) {
-  const holeData = roundData[currentHole] || {};
-  const statBlock = document.getElementById(`${stat}-block`);
-  const selectedBtn = statBlock.querySelector("button.selected");
+function advanceStatOrHole(lastStat) {
+  const stats = selectedStats;
+  const data = roundData[currentHole] || {};
+  const entered = stats.filter(stat => data[stat] !== undefined);
 
-  if (selectedBtn) {
-    const value = selectedBtn.textContent;
-    holeData[stat] = value === "Hit" ? true : value === "X" ? false : parseInt(value);
-    roundData[currentHole] = holeData;
+  if (entered.length === stats.length) {
+if (!courseLayout[currentHole]) {
+  const parInput = document.getElementById(`par${currentHole}`);
+  const parValue = parseInt(parInput?.value);
+  if (parValue) {
+    courseLayout[currentHole] = parValue;
+    localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
   }
+}
 
-  // Save par if not already set
-  if (!courseLayout[currentHole]) {
-    const parInput = document.getElementById(`par${currentHole}`);
-    const parValue = parseInt(parInput?.value);
-    if (parValue) {
-      courseLayout[currentHole] = parValue;
-      localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
-    }
-  }
+// ✅ Always save roundData, even if par wasn’t entered
+localStorage.setItem("roundData", JSON.stringify(roundData));
 
-  // Always persist roundData
-  localStorage.setItem("roundData", JSON.stringify(roundData));
-
-  // Advance to next stat or hole
-  const statIndex = selectedStats.indexOf(stat);
-  if (statIndex < selectedStats.length - 1) {
-    // No renderStat()—just wait for next click
-    return;
-  } else {
-    currentHole++;
-
+    // Clear container before rendering next hole
     const container = document.getElementById("hole-view");
-    container.innerHTML = ""; // Clear previous hole block
+    container.innerHTML = "";
 
-    if (currentHole === 10) {
-      showSummary("front9");
-      const continueBtn = document.createElement("button");
-      continueBtn.textContent = "Continue to Back 9";
-      continueBtn.onclick = () => renderHole(currentHole);
-      container.appendChild(continueBtn);
-      return;
+    currentHole++;
+    if (currentHole <= totalHoles) {
+      renderHole(currentHole);
+    } else {
+      showSummary();
     }
-
-    if (currentHole > totalHoles) {
-      showSummary("front9");
-      showSummary("back9");
-      showSummary("full");
-
-      const fileBtn = document.createElement("button");
-      fileBtn.textContent = "File Round";
-      fileBtn.onclick = () => {
-        alert("Round filed.");
-      };
-      container.appendChild(fileBtn);
-      return;
-    }
-
-    renderHole(currentHole);
   }
 }
 
 
+
+  function getOptions(stat) {
+  if (stat === "score") return [
+    { label: "1", value: 1 },
+    { label: "2", value: 2 },
+    { label: "3", value: 3 },
+    { label: "4", value: 4 },
+    { label: "5", value: 5 },
+    { label: "6", value: 6 },
+    { label: "7", value: 7 },
+    { label: "8", value: 8 }
+  ];
+  if (stat === "putts") return [
+    { label: "0", value: 0 },
+    { label: "1", value: 1 },
+    { label: "2", value: 2 },
+    { label: "3", value: 3 }
+  ];
+if (stat === "gir") return [
+  { label: "Hit", value: true },
+  { label: "X", value: false }
+];
+
+if (stat === "fairway") return [
+  { label: "Hit", value: true },
+  { label: "X", value: false }
+];
+
+
+
+return [];
+
+}
 
 
 function showSummary() {
