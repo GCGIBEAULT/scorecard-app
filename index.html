@@ -111,8 +111,8 @@ function advanceStatOrHole(stat) {
   const selectedBtn = statBlock.querySelector("button.selected");
 
   if (selectedBtn) {
-    const value = selectedBtn.getAttribute("data-value");
-    holeData[stat] = value === "true" ? true : value === "false" ? false : parseInt(value);
+    const value = selectedBtn.textContent;
+    holeData[stat] = value === "Hit" ? true : value === "X" ? false : parseInt(value);
     roundData[currentHole] = holeData;
   }
 
@@ -132,21 +132,23 @@ function advanceStatOrHole(stat) {
   // Advance to next stat or hole
   const statIndex = selectedStats.indexOf(stat);
   if (statIndex < selectedStats.length - 1) {
-    renderStat(selectedStats[statIndex + 1]);
+    // No renderStat()—just wait for next click
+    return;
   } else {
     currentHole++;
 
-    // Front 9 summary
+    const container = document.getElementById("hole-view");
+    container.innerHTML = ""; // Clear previous hole block
+
     if (currentHole === 10) {
       showSummary("front9");
       const continueBtn = document.createElement("button");
       continueBtn.textContent = "Continue to Back 9";
       continueBtn.onclick = () => renderHole(currentHole);
-      document.getElementById("hole-view").appendChild(continueBtn);
+      container.appendChild(continueBtn);
       return;
     }
 
-    // End of round
     if (currentHole > totalHoles) {
       showSummary("front9");
       showSummary("back9");
@@ -156,15 +158,15 @@ function advanceStatOrHole(stat) {
       fileBtn.textContent = "File Round";
       fileBtn.onclick = () => {
         alert("Round filed.");
-        // Optional: archive logic here
       };
-      document.getElementById("hole-view").appendChild(fileBtn);
+      container.appendChild(fileBtn);
       return;
     }
 
     renderHole(currentHole);
   }
 }
+
 
 
 
