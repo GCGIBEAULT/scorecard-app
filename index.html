@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Scorecard App</title>
@@ -42,6 +41,12 @@
     let courseName = "";
     let roundDate = "";
     let courseLayout = {};
+ let overParTracker = {
+  front9: 0,
+  back9: 0,
+  total: 0
+};
+  
 
    function startRound() {
   courseName = document.getElementById("courseName").value.trim();
@@ -94,12 +99,12 @@ holeBlock.appendChild(parInput);
       btn.textContent = opt.label;
 btn.onclick = () => {
   if (!roundData[hole]) roundData[hole] = {};
+
+  // 🛡️ Guard: prevent double-counting
+  if (roundData[hole][stat] !== undefined) return;
+
   roundData[hole][stat] = opt.value;
-
-  // Clear previous selection for this stat
   Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
-
-  // Highlight the selected button
   btn.classList.add("selected");
 
   advanceStatOrHole(stat);
@@ -134,6 +139,17 @@ localStorage.setItem("roundData", JSON.stringify(roundData));
     // Clear container before rendering next hole
     const container = document.getElementById("hole-view");
     container.innerHTML = "";
+const parEl = document.getElementById(`par${currentHole}`);
+const score = roundData[currentHole]?.[stat];
+const par = parseInt(parEl?.value, 10);
+
+if (!isNaN(score) && !isNaN(par)) {
+  const over = score - par;
+  if (currentHole <= 9) overParTracker.front9 += over;
+  else overParTracker.back9 += over;
+  overParTracker.total = overParTracker.front9 + overParTracker.back9;
+  updateOverParDisplay();
+}
 
     currentHole++;
     if (currentHole <= totalHoles) {
