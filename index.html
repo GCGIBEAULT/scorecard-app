@@ -34,11 +34,15 @@
     let selectedStats = [];
     const roundData = {};
 
-    function startRound() {
-      selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
-      document.getElementById("stat-selector").style.display = "none";
-      renderHole(currentHole);
-    }
+let playerHandicap = null;
+
+function startRound() {
+  playerHandicap = parseInt(document.getElementById("handicap").value);
+  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+  document.getElementById("stat-selector").style.display = "none";
+  renderHole(currentHole);
+}
+
 
     function renderHole(hole) {
       const container = document.getElementById("hole-view");
