@@ -129,13 +129,14 @@
     { label: "2", value: 2 },
     { label: "3", value: 3 }
   ];
-  if (stat === "gir") return [
-    { label: "✅ GIR", value: true }
-  ];
-  if (stat === "fairway") return [
-    { label: "✅ Fairway", value: true }
-  ];
-  return [];
+if (stat === "gir") return [
+  { label: "Hit", value: true }
+];
+if (stat === "fairway") return [
+  { label: "Hit", value: true }
+];
+return [];
+
 }
 
 
