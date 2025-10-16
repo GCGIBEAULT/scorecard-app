@@ -50,6 +50,7 @@ function startRound() {
   roundDate = document.getElementById("roundDate").value;
   playerHandicap = parseInt(document.getElementById("handicap").value);
 
+  // Capture selected stats BEFORE hiding the selector
   selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
   const savedLayout = localStorage.getItem(`layout_${courseName}`);
@@ -57,9 +58,11 @@ function startRound() {
     courseLayout = JSON.parse(savedLayout);
   }
 
+  // Hide the stat selector after capturing values
   document.getElementById("stat-selector").style.display = "none";
 
-  currentHole = 1; // ✅ This line was missing
+  // Set current hole and render it
+  currentHole = 1;
   renderHole(currentHole);
 }
 
