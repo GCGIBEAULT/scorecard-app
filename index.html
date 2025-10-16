@@ -59,22 +59,20 @@ courseLayout = {};
     }
 
 function renderHole(hole) {
-  const container = document.getElementById("hole-view");
-
-  const holeBlock = document.createElement("div");
-  holeBlock.className = "hole-block";
+  const holeBlock = document.getElementById("hole-view");
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
-if (hole === 1 || !courseLayout[hole]) {
-const parInput = document.createElement("div");
-parInput.innerHTML = `
-  <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
-  <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="" />
-  <br><br>
-`;
-holeBlock.appendChild(parInput);
+  const parInput = document.createElement("div");
+  parInput.innerHTML = `
+    <label for="par${hole}"><strong>Par for Hole ${hole}:</strong></label>
+    <input type="number" id="par${hole}" min="3" max="5" style="width: 50px;" value="" />
+    <br><br>
+  `;
+  holeBlock.appendChild(parInput);
 
+  // Add your stat inputs here (score, putts, GIR, etc.)
 }
+
 
   selectedStats.forEach(stat => {
     const statBlock = document.createElement("div");
