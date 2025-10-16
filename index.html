@@ -45,20 +45,23 @@
     let roundDate = "";
     let courseLayout = {};
 
-    function startRound() {
-      courseName = document.getElementById("courseName").value.trim();
-      roundDate = document.getElementById("roundDate").value;
-      playerHandicap = parseInt(document.getElementById("handicap").value);
-      selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+function startRound() {
+  courseName = document.getElementById("courseName").value.trim();
+  roundDate = document.getElementById("roundDate").value;
+  playerHandicap = parseInt(document.getElementById("handicap").value);
 
-      const savedLayout = localStorage.getItem(`layout_${courseName}`);
-      if (savedLayout) {
-        courseLayout = JSON.parse(savedLayout);
-      }
+  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-      document.getElementById("stat-selector").style.display = "none";
-      renderHole(currentHole);
-    }
+  const savedLayout = localStorage.getItem(`layout_${courseName}`);
+  if (savedLayout) {
+    courseLayout = JSON.parse(savedLayout);
+  }
+
+  document.getElementById("stat-selector").style.display = "none";
+
+  currentHole = 1; // ✅ This line was missing
+  renderHole(currentHole);
+}
 
     function renderHole(hole) {
       const container = document.getElementById("hole-view");
