@@ -175,7 +175,7 @@ function showSummary(scope = "full") {
     if (typeof holeData.putts === "number") totalPutts += holeData.putts;
     if (holeData.gir === true) girHits++;
     if (holeData.fairway === true) fairwayHits++;
-  });
+  }); // ← Closing brace #1
 
   if (scope === "front9") {
     const diff = totalScore - totalPar;
@@ -195,8 +195,8 @@ function showSummary(scope = "full") {
     `;
 
     document.getElementById("summary-block").innerHTML = summaryHTML;
-  }
-}
+  } // ← Closing brace #2
+}   // ← Closing brace #3
 
 
 
