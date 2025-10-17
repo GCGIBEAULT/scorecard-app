@@ -231,18 +231,22 @@ function showSummary(scope = "full") {
   const diff = totalScore - totalPar;
   const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
 
-  summaryHTML += `
-        </tbody>
-      </table>
-      <p><strong>Total Score:</strong> ${totalScore}</p>
-      <p><strong>Total Par:</strong> ${totalPar}</p>
-      <p><strong>Result:</strong> ${overUnder}</p>
-    </div>
-  `;
+summaryHTML += `
+  </tbody>
+</table>
+<p><strong>Total Score:</strong> ${totalScore}</p>
+<p><strong>Total Par:</strong> ${totalPar}</p>
+<p><strong>Result:</strong> ${overUnder}</p>
+</div>
+`;
 
-  container.innerHTML += summaryHTML;
+if (scope === "front9") {
+  summaryHTML += `
+    <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+  `;
 }
 
+container.innerHTML += summaryHTML;
 
   </script>
 </body>
