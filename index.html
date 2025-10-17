@@ -43,59 +43,27 @@
     let courseName = "";
     let roundDate = "";
     let courseLayout = {};
-<script>
-let currentHole = 1;
-const totalHoles = 18;
-let selectedStats = [];
-const roundData = {};
-let playerHandicap = null;
-let courseName = "";
-let roundDate = "";
-let courseLayout = {};
 
-/* INSERT THE HELPERS HERE */
-
-function startRound() {
-  ...
+   function startRound() {
+  courseName = document.getElementById("courseName").value.trim();
+  roundDate = document.getElementById("roundDate").value;
+  const dateInput = document.getElementById("roundDate");
+if (dateInput && dateInput.value) {
+  dateInput.blur();
+  dateInput.dispatchEvent(new Event("change", { bubbles: true }));
 }
+   
+  playerHandicap = parseInt(document.getElementById("handicap").value, 10);
+  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-function startRound() {
-  // read basic inputs
-  courseName = document.getElementById('courseName')?.value?.trim() || "";
-  roundDate = document.getElementById('roundDate')?.value || "";
-  const hc = parseInt(document.getElementById('handicap')?.value, 10);
-  playerHandicap = Number.isFinite(hc) ? hc : null;
+  // Wipe ghost layout and reset
+  if (courseName) localStorage.removeItem(`layout_${courseName}`);
+  courseLayout = {};
 
-  // collect selected stats from the checkboxes inside stat-selector
-  const checkboxes = Array.from(document.querySelectorAll('#stat-selector input[type="checkbox"]'));
-  selectedStats = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
-
-  // hide the stat selector (same element your UI uses for Start Round)
-  const selector = document.getElementById('stat-selector');
-  if (selector) selector.style.display = 'none';
-
-  // load saved course layout if any (keeps existing behavior)
-  try {
-    const saved = localStorage.getItem(`layout_${courseName}`);
-    courseLayout = saved ? JSON.parse(saved) : {};
-  } catch (e) {
-    courseLayout = {};
-  }
-
-  // ensure roundData entries exist for holes 1..totalHoles without overwriting existing scores
-  for (let i = 1; i <= totalHoles; i++) {
-    if (!roundData[i]) roundData[i] = {};
-  }
-
-  // initialize top running status (one-line call you asked for)
-  if (typeof renderRunningForTop === 'function') {
-    renderRunningForTop(0);
-  }
-
-  // render the first hole using your existing renderHole function
-  if (typeof renderHole === 'function') {
-    renderHole(currentHole);
-  }
+  // Initialize round
+  currentHole = 1;
+  document.getElementById("stat-selector").style.display = "none";
+  renderHole(currentHole);
 }
 
 function renderHole(hole) {
@@ -152,27 +120,22 @@ function advanceStatOrHole(lastStat) {
   const entered = stats.filter(stat => data[stat] !== undefined);
 
   if (entered.length === stats.length) {
-    // Save par for this hole if entered and not already stored
-    if (!courseLayout[currentHole]) {
-      const parInput = document.getElementById(`par${currentHole}`);
-      const parValue = parseInt(parInput?.value, 10);
-      if (parValue) {
-        courseLayout[currentHole] = parValue;
-        localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
-      }
-    }
+if (!courseLayout[currentHole]) {
+  const parInput = document.getElementById(`par${currentHole}`);
+  const parValue = parseInt(parInput?.value);
+  if (parValue) {
+    courseLayout[currentHole] = parValue;
+    localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+  }
+}
 
-    // Always save roundData
-    localStorage.setItem("roundData", JSON.stringify(roundData));
+// ✅ Always save roundData, even if par wasn’t entered
+localStorage.setItem("roundData", JSON.stringify(roundData));
 
-    // Update the top running status to reflect holes 1..currentHole
-    if (typeof renderRunningForTop === 'function') {
-      renderRunningForTop(currentHole);
-    }
-
-    // Clear the hole view and advance to next hole
+    // Clear container before rendering next hole
     const container = document.getElementById("hole-view");
     container.innerHTML = "";
+
     currentHole++;
     if (currentHole <= totalHoles) {
       renderHole(currentHole);
