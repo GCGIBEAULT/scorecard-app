@@ -52,3 +52,13 @@ button.selected {
   color: white;
   border: 2px solid #0056b3;
 }
+#top-running-status {
+  margin: 8px 0 12px 0;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.running-status.over { color: #b00020; }
+.running-status.under { color: #1b5e20; }
+.running-status.even { color: #333; }
