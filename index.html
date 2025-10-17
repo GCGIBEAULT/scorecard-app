@@ -242,11 +242,14 @@ summaryHTML += `
 
 if (scope === "front9") {
   summaryHTML += `
-    <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+    <div class="next-block">
+      <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+    </div>
   `;
 }
 
 container.innerHTML += summaryHTML;
+
 
   </script>
 </body>
