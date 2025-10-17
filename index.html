@@ -74,13 +74,14 @@ function renderHole(hole) {
   holeBlock.className = "hole-block";
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
-if (hole === 1 || !courseLayout[hole]) {
-const parDisplay = document.createElement("div");
-parDisplay.className = "hole-label"; // reuse the same class as Hole 1
-parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
-holeBlock.appendChild(parDisplay);
-
+if (hole === 1 || courseLayout[hole]) {
+  const parDisplay = document.createElement("h2");
+  parDisplay.className = "hole-label"; // matches Hole X styling
+  parDisplay.style.marginTop = "0.5em"; // adds spacing
+  parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
+  holeBlock.appendChild(parDisplay);
 }
+
 
   selectedStats.forEach(stat => {
     const statBlock = document.createElement("div");
