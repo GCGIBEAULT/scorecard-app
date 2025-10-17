@@ -228,18 +228,6 @@ function showSummary(scope = "full") {
     if (holeData.gir === true) girHits++;
     if (holeData.fairway === true) fairwayHits++;
 
-    summaryHTML += `
-      <tr>
-        <td>${i}</td>
-        <td>${par}</td>
-        <td>${score}</td>
-        <td>${putts}</td>
-        <td>${gir}</td>
-        <td>${fairway}</td>
-      </tr>
-    `;
-  });
-
 const diff = totalScore - totalPar;
 const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
 
@@ -262,6 +250,7 @@ if (scope === "front9") {
 
 summaryHTML += `</div>`;
 document.getElementById("summary-block").innerHTML = summaryHTML;
+</script>
 
 
 
