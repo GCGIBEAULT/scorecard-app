@@ -252,12 +252,13 @@ if (scope === "full") {
   const frontStats = getSegmentStats(frontHoles);
   const backStats = getSegmentStats(backHoles);
 
-  summaryHTML += `
-    <div class="split-summary">
-      <p><strong>Front 9:</strong> ${frontStats.score} | Putts: ${frontStats.putts} | GIRs: ${frontStats.girs} (${frontStats.girPct}%) | Fairways: ${frontStats.fairways} (${frontStats.fairwayPct}%)</p>
-      <p><strong>Back 9:</strong> ${backStats.score} | Putts: ${backStats.putts} | GIRs: ${backStats.girs} (${backStats.girPct}%) | Fairways: ${backStats.fairways} (${backStats.fairwayPct}%)</p>
-    </div>
-  `;
+summaryHTML += `
+  <div class="split-summary">
+    <p><strong>Front 9:</strong> ${frontStats.score} | Putts: ${frontStats.putts} | GIRs: ${frontStats.girs} (${frontStats.girPct}%) | Fairways: ${frontStats.fairways} (${frontStats.fairwayPct}%)</p>
+    <p><strong>Back 9:</strong> ${backStats.score} | Putts: ${backStats.putts} | GIRs: ${backStats.girs} (${backStats.girPct}%) | Fairways: ${backStats.fairways} (${backStats.fairwayPct}%)</p>
+  </div>
+`;
+
 }
 
 
