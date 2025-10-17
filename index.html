@@ -133,19 +133,22 @@ function advanceStatOrHole(lastStat) {
     const container = document.getElementById("hole-view");
     container.innerHTML = "";
 
-    currentHole++;
+currentHole++;
 
-    if (currentHole <= totalHoles) {
-      if (currentHole === 10) {
-        showSummary("front9");
-      }
-      renderHole(currentHole);
+if (currentHole === 10) {
+  showSummary("front9");
+  return; // ⛔ Prevents Hole 10 from rendering immediately
+}
+
+if (currentHole <= totalHoles) {
+  renderHole(currentHole);
     } else {
       showSummary("back9");
       showSummary("full");
     }
-  }
-}
+  } // ✅ Closes: if (entered.length === stats.length)
+}   // ✅ Closes: function advanceStatOrHole
+
 
 
 
