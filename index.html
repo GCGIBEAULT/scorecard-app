@@ -240,31 +240,28 @@ function showSummary(scope = "full") {
     `;
   });
 
-  const diff = totalScore - totalPar;
-  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
+const diff = totalScore - totalPar;
+const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
 
+summaryHTML = `
+  <div class="summary-block">
+    <h2>Front 9 Summary</h2>
+    <p><strong>Score:</strong> ${totalScore} (${overUnder})</p>
+    <p><strong>Putts:</strong> ${totalPutts}</p>
+    <p><strong>GIRs:</strong> ${girHits}</p>
+    <p><strong>Fairways:</strong> ${fairwayHits}</p>
+`;
+
+if (scope === "front9") {
   summaryHTML += `
-        </tbody>
-      </table>
-      <p><strong>Total Score:</strong> ${totalScore}</p>
-      <p><strong>Total Par:</strong> ${totalPar}</p>
-      <p><strong>Result:</strong> ${overUnder}</p>
-      <p><strong>Total Putts:</strong> ${totalPutts}</p>
-      <p><strong>GIR Hit Count:</strong> ${girHits}</p>
-      <p><strong>Fairway Hit Count:</strong> ${fairwayHits}</p>
+    <div class="next-block">
+      <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+    </div>
   `;
-
-  if (scope === "front9") {
-    summaryHTML += `
-      <div class="next-block">
-        <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
-      </div>
-    `;
-  }
-
-  summaryHTML += `</div>`;
-  document.getElementById("summary-block").innerHTML = summaryHTML;
 }
+
+summaryHTML += `</div>`;
+document.getElementById("summary-block").innerHTML = summaryHTML;
 
 
 
