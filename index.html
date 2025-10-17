@@ -186,7 +186,7 @@ return [];
 
 
 function showSummary(scope = "full") {
-  const container = document.getElementById("hole-view");
+
   let holes = [];
 
   if (scope === "front9") holes = Array.from({ length: 9 }, (_, i) => i + 1);
@@ -250,7 +250,7 @@ if (scope === "front9") {
 
 
 document.getElementById("summary-block").innerHTML = summaryHTML;
-
+}
 
 
   </script>
