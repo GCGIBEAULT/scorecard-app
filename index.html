@@ -186,15 +186,19 @@ return [];
 
 
 function showSummary(scope = "full") {
-
   let holes = [];
 
-  if (scope === "front9") holes = Array.from({ length: 9 }, (_, i) => i + 1);
-  else if (scope === "back9") holes = Array.from({ length: 9 }, (_, i) => i + 10);
-  else holes = Array.from({ length: totalHoles }, (_, i) => i + 1);
+  if (scope === "front9") {
+    holes = Array.from({ length: 9 }, (_, i) => i + 1);
+  } else if (scope === "back9") {
+    holes = Array.from({ length: 9 }, (_, i) => i + 10);
+  } else {
+    holes = Array.from({ length: totalHoles }, (_, i) => i + 1);
+  }
 
   let totalScore = 0;
   let totalPar = 0;
+
   let summaryHTML = `
     <div class="summary-block">
       <h2>${scope === "front9" ? "Front 9" : scope === "back9" ? "Back 9" : "Full Round"} Summary</h2>
@@ -231,25 +235,25 @@ function showSummary(scope = "full") {
   const diff = totalScore - totalPar;
   const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
 
-summaryHTML += `
-  </tbody>
-</table>
-<p><strong>Total Score:</strong> ${totalScore}</p>
-<p><strong>Total Par:</strong> ${totalPar}</p>
-<p><strong>Result:</strong> ${overUnder}</p>
-</div>
-`;
-
-if (scope === "front9") {
   summaryHTML += `
-    <div class="next-block">
-      <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+        </tbody>
+      </table>
+      <p><strong>Total Score:</strong> ${totalScore}</p>
+      <p><strong>Total Par:</strong> ${totalPar}</p>
+      <p><strong>Result:</strong> ${overUnder}</p>
     </div>
   `;
-}
 
+  if (scope === "front9") {
+    summaryHTML += `
+      <div class="next-block">
+        <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+      </div>
+    `;
+  }
 
-document.getElementById("summary-block").innerHTML = summaryHTML;
+  // ✅ Final injection—no bleed, no override
+  document.getElementById("summary-block").innerHTML = summaryHTML;
 }
 
 
