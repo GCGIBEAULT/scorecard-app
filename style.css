@@ -59,10 +59,31 @@ button.selected {
   line-height: 1.2;
 }
 
+/* ──────────────────────────────── */
+/* Running Status Color Indicators */
+/* ──────────────────────────────── */
 .running-status.over { color: #b00020; }
 .running-status.under { color: #1b5e20; }
 .running-status.even { color: #333; }
+
+/* ──────────────────────────────── */
+/* Summary Block: Next Action CTA  */
+/* ──────────────────────────────── */
 .next-block {
-  margin-top: 20px;
+  margin-top: 24px;
+  padding: 12px 0;
   text-align: center;
+  border-top: 1px solid #ccc;
+}
+
+.next-block button {
+  background-color: #007BFF;
+  color: white;
+  border: 2px solid #0056b3;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.next-block button:hover {
+  background-color: #0056b3;
+  transform: scale(1.03);
 }
