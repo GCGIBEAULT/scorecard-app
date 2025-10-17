@@ -188,68 +188,26 @@ return [];
 }
 
 
-function showSummary(scope = "full") {
-  let holes = [];
-  if (scope === "front9") {
-    holes = Array.from({ length: 9 }, (_, i) => i + 1);
-  } else if (scope === "back9") {
-    holes = Array.from({ length: 9 }, (_, i) => i + 10);
-  } else {
-    holes = Array.from({ length: totalHoles }, (_, i) => i + 1);
-  }
-
-  let totalScore = 0;
-  let totalPar = 0;
-  let totalPutts = 0;
-  let girHits = 0;
-  let fairwayHits = 0;
+if (scope === "front9") {
+  const diff = totalScore - totalPar;
+  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
 
   let summaryHTML = `
     <div class="summary-block">
-      <h2>${scope === "front9" ? "Front 9" : scope === "back9" ? "Back 9" : "Full Round"} Summary</h2>
-      <table>
-        <thead>
-          <tr><th>Hole</th><th>Par</th><th>Score</th><th>Putts</th><th>GIR</th><th>Fairway</th></tr>
-        </thead>
-        <tbody>
-  `;
-
-  holes.forEach(i => {
-    const holeData = roundData[i] || {};
-    const par = courseLayout[i] || "-";
-    const score = holeData.score ?? "-";
-    const putts = holeData.putts ?? "-";
-    const gir = `<button class="stat-btn${holeData.gir === true ? ' selected' : ''}">${holeData.gir === true ? 'Hit' : 'X'}</button>`;
-    const fairway = `<button class="stat-btn${holeData.fairway === true ? ' selected' : ''}">${holeData.fairway === true ? 'Hit' : 'X'}</button>`;
-
-    if (typeof score === "number") totalScore += score;
-    if (typeof par === "number") totalPar += par;
-    if (typeof holeData.putts === "number") totalPutts += holeData.putts;
-    if (holeData.gir === true) girHits++;
-    if (holeData.fairway === true) fairwayHits++;
-
-const diff = totalScore - totalPar;
-const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
-
-summaryHTML = `
-  <div class="summary-block">
-    <h2>Front 9 Summary</h2>
-    <p><strong>Score:</strong> ${totalScore} (${overUnder})</p>
-    <p><strong>Putts:</strong> ${totalPutts}</p>
-    <p><strong>GIRs:</strong> ${girHits}</p>
-    <p><strong>Fairways:</strong> ${fairwayHits}</p>
-`;
-
-if (scope === "front9") {
-  summaryHTML += `
-    <div class="next-block">
-      <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+      <h2>Front 9 Summary</h2>
+      <p><strong>Score:</strong> ${totalScore} (${overUnder})</p>
+      <p><strong>Putts:</strong> ${totalPutts}</p>
+      <p><strong>GIRs:</strong> ${girHits}</p>
+      <p><strong>Fairways:</strong> ${fairwayHits}</p>
+      <div class="next-block">
+        <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+      </div>
     </div>
   `;
+
+  document.getElementById("summary-block").innerHTML = summaryHTML;
 }
 
-summaryHTML += `</div>`;
-document.getElementById("summary-block").innerHTML = summaryHTML;
 
   </script>
 </body>
