@@ -219,8 +219,47 @@ let summaryHTML = `
         <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
       </div>
     ` : ""}
-  </div>
+ </div>
 `;
+
+if (scope === "full") {
+  const frontHoles = Array.from({ length: 9 }, (_, i) => i + 1);
+  const backHoles = Array.from({ length: 9 }, (_, i) => i + 10);
+
+  function getSegmentStats(segment) {
+    let score = 0, putts = 0, girs = 0, fairways = 0, fairwayEligible = 0;
+    segment.forEach(i => {
+      const hole = roundData[i] || {};
+      const par = courseLayout[i];
+      if (typeof hole.score === "number") score += hole.score;
+      if (typeof hole.putts === "number") putts += hole.putts;
+      if (hole.gir === true) girs++;
+      if (typeof par === "number" && par > 3) {
+        fairwayEligible++;
+        if (hole.fairway === true) fairways++;
+      }
+    });
+    return {
+      score,
+      putts,
+      girs,
+      girPct: Math.round((girs / segment.length) * 100),
+      fairways,
+      fairwayPct: fairwayEligible > 0 ? Math.round((fairways / fairwayEligible) * 100) : 0
+    };
+  }
+
+  const frontStats = getSegmentStats(frontHoles);
+  const backStats = getSegmentStats(backHoles);
+
+  summaryHTML += `
+    <div class="split-summary">
+      <p><strong>Front 9:</strong> ${frontStats.score} | Putts: ${frontStats.putts} | GIRs: ${frontStats.girs} (${frontStats.girPct}%) | Fairways: ${frontStats.fairways} (${frontStats.fairwayPct}%)</p>
+      <p><strong>Back 9:</strong> ${backStats.score} | Putts: ${backStats.putts} | GIRs: ${backStats.girs} (${backStats.girPct}%) | Fairways: ${backStats.fairways} (${backStats.fairwayPct}%)</p>
+    </div>
+  `;
+}
+
 
   
 
