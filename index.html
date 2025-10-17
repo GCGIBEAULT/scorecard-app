@@ -207,20 +207,22 @@ function showSummary(scope = "front9") {
   const fairwayPct = fairwayEligible > 0 ? Math.round((fairwayHits / fairwayEligible) * 100) : 0;
   const scopeLabel = scope === "full" ? "Full Round" : scope === "back9" ? "Back 9" : "Front 9";
 
-  let summaryHTML = `
-    <div class="summary-block">
-      <h2>${scopeLabel} Summary</h2>
-      <p><strong>Score:</strong> ${totalScore} (${overUnder})</p>
-      <p><strong>Putts:</strong> ${totalPutts}</p>
-      <p><strong>GIRs:</strong> ${girHits} (${girPct}%)</p>
-      <p><strong>Fairways:</strong> ${fairwayHits} of ${fairwayEligible} (${fairwayPct}%)</p>
-      ${scope === "front9" ? `
-        <div class="next-block">
-          <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
-        </div>
-      ` : ""}
-    </div>
-  `;
+let summaryHTML = `
+  <div class="summary-block">
+    <h2>${scopeLabel} Summary</h2>
+    <p><strong>Score:</strong> ${totalScore} (${overUnder})</p>
+    <p><strong>Putts:</strong> ${totalPutts}</p>
+    <p><strong>GIRs:</strong> ${girHits} (${girPct}%)</p>
+    <p><strong>Fairways:</strong> ${fairwayHits} of ${fairwayEligible} (${fairwayPct}%)</p>
+    ${scope === "front9" ? `
+      <div class="next-block">
+        <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
+      </div>
+    ` : ""}
+  </div>
+`;
+
+  
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
 }
