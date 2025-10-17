@@ -134,14 +134,13 @@ function advanceStatOrHole(lastStat) {
     container.innerHTML = "";
 
     currentHole++;
-    if (currentHole === 10) {
-      showSummary("front9");
-    }
 
     if (currentHole <= totalHoles) {
+      if (currentHole === 10) {
+        showSummary("front9");
+      }
       renderHole(currentHole);
     } else {
-      showSummary("front9");
       showSummary("back9");
       showSummary("full");
     }
