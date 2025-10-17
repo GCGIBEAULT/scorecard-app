@@ -168,8 +168,8 @@ function showSummary(scope = "front9") {
     if (typeof score === "number") totalScore += score;
     if (typeof par === "number") totalPar += par;
     if (typeof holeData.putts === "number") totalPutts += holeData.putts;
-
     if (holeData.gir === true) girHits++;
+
     if (typeof par === "number" && par > 3) {
       fairwayEligible++;
       if (holeData.fairway === true) fairwayHits++;
@@ -188,7 +188,6 @@ function showSummary(scope = "front9") {
       <p><strong>Putts:</strong> ${totalPutts}</p>
       <p><strong>GIRs:</strong> ${girHits} (${girPct}%)</p>
       <p><strong>Fairways:</strong> ${fairwayHits} of ${fairwayEligible} (${fairwayPct}%)</p>
-
       <div class="next-block">
         <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
       </div>
@@ -197,6 +196,7 @@ function showSummary(scope = "front9") {
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
 }
+
      
 
 
