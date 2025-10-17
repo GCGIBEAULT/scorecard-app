@@ -73,6 +73,52 @@ function renderHole(hole) {
   const holeBlock = document.createElement("div");
   holeBlock.className = "hole-block";
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
+if (hole === 1 || courseLayout[hole]) {
+  const parDisplay = document.createElement("h2");
+  parDisplay.className = "hole-label";
+  parDisplay.style.marginTop = "0.5em";
+  parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
+  holeBlock.appendChild(parDisplay);
+
+  // 🧱 Inject par-entry grid
+  const grid = document.createElement("div");
+  grid.id = "par-entry-grid";
+
+  const row1 = document.createElement("div");
+  row1.className = "par-row";
+  row1.id = "par-row-1";
+
+  const row2 = document.createElement("div");
+  row2.className = "par-row";
+  row2.id = "par-row-2";
+
+  grid.appendChild(row1);
+  grid.appendChild(row2);
+  holeBlock.appendChild(grid);
+
+  // 🧠 Populate 18 inputs
+  for (let i = 1; i <= 18; i++) {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = 3;
+    input.max = 5;
+    input.placeholder = `Hole ${i}`;
+    input.className = "par-input";
+    input.onchange = () => {
+      const val = parseInt(input.value, 10);
+      if (val >= 3 && val <= 5) {
+        courseLayout[i] = val;
+        if (i === hole) {
+          parDisplay.textContent = `Par ${val}`;
+        }
+        if (Object.keys(courseLayout).length === 18) {
+          grid.remove(); // 🧼 Clean up once all 18 are entered
+        }
+      }
+    };
+    (i <= 9 ? row1 : row2).appendChild(input);
+  }
+}
 
 if (hole === 1 || courseLayout[hole]) {
   const parDisplay = document.createElement("h2");
@@ -81,6 +127,10 @@ if (hole === 1 || courseLayout[hole]) {
   parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
   holeBlock.appendChild(parDisplay);
 }
+<div id="par-entry-grid">
+  <div class="par-row" id="par-row-1"></div>
+  <div class="par-row" id="par-row-2"></div>
+</div>
 
 
   selectedStats.forEach(stat => {
