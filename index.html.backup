@@ -58,8 +58,9 @@ if (dateInput && dateInput.value) {
   selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
   // Wipe ghost layout and reset
-  if (courseName) localStorage.removeItem(`layout_${courseName}`);
-  courseLayout = {};
+const savedLayout = localStorage.getItem(`layout_${courseName}`);
+courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
+
 
   // Initialize round
   currentHole = 1;
