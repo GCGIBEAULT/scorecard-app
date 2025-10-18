@@ -87,3 +87,15 @@ button.selected {
   background-color: #0056b3;
   transform: scale(1.03);
 }
+.par-row {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.par-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  font-size: 1rem;
+}
