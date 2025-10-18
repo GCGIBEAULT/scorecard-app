@@ -83,56 +83,47 @@ if (Object.keys(courseLayout).length < 18) {
   grid.style.gap = "6px";
   grid.style.padding = "8px 0";
   grid.style.width = "100%";
-
-  for (let i = 1; i <= 18; i++) {
-    const wrapper = document.createElement("div");
-    wrapper.style.display = "flex";
-    wrapper.style.flexDirection = "column";
-    wrapper.style.alignItems = "center";
-
-
-
-const input = document.createElement("input");
-input.type = "number";
-input.min = 3;
-input.max = 5;
-input.className = "par-input";
-input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
-input.placeholder = `${i}`;
-input.autocomplete = "off";
-
-
-
-    input.style.width = "100%";
-    input.style.boxSizing = "border-box";
-    input.style.padding = "6px";
-    input.style.fontSize = "0.9rem";
-    input.style.border = "1px solid #ccc";
-    input.style.borderRadius = "4px";
-    input.style.transition = "border-color 0.2s ease";
-
-    input.onmouseover = () => input.style.borderColor = "#007bff";
-    input.onmouseout = () => input.style.borderColor = "#ccc";
-
-    input.onchange = () => {
-      const val = parseInt(input.value, 10);
-      if (val >= 3 && val <= 5) {
-        courseLayout[i] = val;
-        if (i === hole) {
-          const parLabel = document.querySelector(".hole-label");
-          if (parLabel) parLabel.textContent = `Par ${val}`;
-        }
-        if (Object.keys(courseLayout).length === 18) {
-          grid.remove();
-          document.getElementById("hole-view").innerHTML = "";
-          renderHole(1);
-        }
+for ( let i = 1 ; i <= 18 ; i++ ) {
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.flexDirection = "column";
+  wrapper.style.alignItems = "center";
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = 3;
+  input.max = 5;
+  input.className = "par-input";
+  input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
+  input.placeholder = ` ${ i } `;
+  input.autocomplete = "off";
+  input.style.width = "100%";
+  input.style.boxSizing = "border-box";
+  input.style.padding = "6px";
+  input.style.fontSize = "0.9rem";
+  input.style.border = "1px solid #ccc";
+  input.style.borderRadius = "4px";
+  input.style.transition = "border-color 0.2s ease";
+  input.onmouseover = () => input.style.borderColor = "#007bff";
+  input.onmouseout = () => input.style.borderColor = "#ccc";
+  input.onchange = () => {
+    const val = parseInt(input.value, 10);
+    if (val >= 3 && val <= 5) {
+      courseLayout[i] = val;
+      if (i === hole) {
+        const parLabel = document.querySelector(".hole-label");
+        if (parLabel) parLabel.textContent = `Par ${val}`;
       }
-    };
+      if (Object.keys(courseLayout).length === 18) {
+        grid.remove();
+        document.getElementById("hole-view").innerHTML = "";
+        renderHole(1);
+      }
+    }
+  };
+  wrapper.appendChild(input);
+  grid.appendChild(wrapper);
+}
 
-    wrapper.appendChild(input);
-    grid.appendChild(wrapper);
-  }
 
   holeBlock.appendChild(grid);
 }
