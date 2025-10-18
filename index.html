@@ -72,77 +72,99 @@ function renderHole(hole) {
   const container = document.getElementById("hole-view");
   container.innerHTML = "";
 
-  // 18-block par grid (preserve history layout)
-  const parGrid = document.createElement('div');
-  parGrid.className = 'par-row';
+  // show current hole and par (if known)
+  const status = document.getElementById("top-running-status");
+  if (status) status.textContent = `Hole ${hole} of ${totalHoles}`;
+
+  // 18-block par row (history)
+  const parGrid = document.createElement("div");
+  parGrid.className = "par-row";
   for (let i = 1; i <= 18; i++) {
-    const inp = document.createElement('input');
-    inp.className = 'par-input';
-    inp.type = 'number';
+    const inp = document.createElement("input");
+    inp.className = "par-input";
+    inp.type = "number";
     inp.min = 3; inp.max = 5;
+    inp.placeholder = `Hole ${i}`;
     inp.id = `par-${i}`;
     if (roundData.pars && roundData.pars[i] !== undefined) inp.value = roundData.pars[i];
     parGrid.appendChild(inp);
   }
   container.appendChild(parGrid);
 
-  // active stat groups
-  selectedStats.forEach(stat => {
-    const group = document.createElement('div');
-    group.className = 'stat-block';
+  // active stat area header with explicit current par display
+  const activeHeader = document.createElement("div");
+  activeHeader.className = "active-header";
+  const currentParInput = document.getElementById(`par-${hole}`);
+  const currentParText = currentParInput && currentParInput.value ? `Par ${currentParInput.value}` : "Par —";
+  activeHeader.textContent = `Hole ${hole} — ${currentParText}`;
+  container.appendChild(activeHeader);
 
-    const label = document.createElement('div');
+  // render stat groups
+  selectedStats.forEach(stat => {
+    const group = document.createElement("div");
+    group.className = "button-group";
+
+    const label = document.createElement("div");
     label.textContent = stat.toUpperCase();
-    label.style.fontWeight = 'bold';
+    label.style.fontWeight = "bold";
     group.appendChild(label);
 
     const options = getOptions(stat);
     options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.type = 'button';                 // critical: no implicit submit
-      btn.className = 'stat-button';
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "stat-button";
       btn.textContent = opt.label;
       btn.dataset.stat = stat;
       btn.dataset.value = (opt.value !== undefined) ? String(opt.value) : String(opt.label);
 
       const handler = function (ev) {
         ev.preventDefault();
-        ev.stopImmediatePropagation();     // prevents global handlers from seeing this click
-        if (btn.classList.contains('locked')) return;
-        btn.classList.add('locked');
-        btn.disabled = true;
+        ev.stopImmediatePropagation();
 
+        // ensure one recorded value per stat per hole
         if (!roundData[hole]) roundData[hole] = {};
+        if (roundData[hole][stat] !== undefined) return;
+
+        // lock visually and persist
+        btn.classList.add("locked");
+        btn.disabled = true;
         roundData[hole][stat] = btn.dataset.value;
 
         // persist par if present
-        const parInput = document.getElementById(`par-${hole}`);
-        if (parInput && parInput.value) {
+        const pInp = document.getElementById(`par-${hole}`);
+        if (pInp && pInp.value) {
           roundData.pars = roundData.pars || {};
-          roundData.pars[hole] = parInput.value;
+          roundData.pars[hole] = pInp.value;
         }
 
-        // update status text only; do NOT advance hole
-        const statusEl = document.getElementById('top-running-status');
+        // update status text but do NOT advance hole
+        const statusEl = document.getElementById("top-running-status");
         if (statusEl) statusEl.textContent = `Hole ${currentHole} of ${totalHoles} — recorded ${stat}: ${btn.dataset.value}`;
 
-        btn.removeEventListener('click', handler);
+        // remove listener so it cannot fire again
+        btn.removeEventListener("click", handler);
       };
 
-      btn.addEventListener('click', handler);
+      btn.addEventListener("click", handler);
       group.appendChild(btn);
     });
 
     container.appendChild(group);
   });
 
-  // ensure start button is non-submit in DOM
-  const startBtn = document.querySelector('#stat-selector button');
-  if (startBtn) startBtn.type = 'button';
+  // Defensive guard: short-lived capture-phase stopper so delegated advance handlers can't react
+  const guard = function (ev) {
+    if (container.contains(ev.target)) {
+      ev.stopImmediatePropagation();
+    }
+  };
+  window.addEventListener("click", guard, true);
+  setTimeout(() => window.removeEventListener("click", guard, true), 350);
 
-  // update header status only
-  const statusEl = document.getElementById('top-running-status');
-  if (statusEl) statusEl.textContent = `Hole ${hole} of ${totalHoles}`;
+  // ensure Start Round button is non-submit
+  const startBtn = document.querySelector("#stat-selector button");
+  if (startBtn) startBtn.type = "button";
 }
 
 
