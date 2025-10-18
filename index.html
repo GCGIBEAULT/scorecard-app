@@ -7,20 +7,17 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Start Your Round</h1>
-<div id="top-running-status" class="running-status even"></div>
+<div id="start-round-form">
+  <h2>Start Your Round</h2>
 
   <label for="courseName"><strong>Course Name:</strong></label>
   <input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
-  <br><br>
 
   <label for="roundDate"><strong>Date:</strong></label>
   <input type="date" id="roundDate" />
-  <br><br>
 
   <label for="handicap"><strong>Handicap:</strong></label>
   <input type="number" id="handicap" />
-  <br><br>
 
   <div id="stat-selector">
     <strong>Select Stats to Track:</strong><br>
@@ -31,6 +28,8 @@
     <br><br>
     <button onclick="startRound()">Start Round</button>
   </div>
+</div>
+
 
   <section id="hole-view"></section>
 <section id="summary-block"></section>
