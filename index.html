@@ -322,7 +322,7 @@ if (scope === "full") {
 
 
 
-  function getOptions(stat) {
+function getOptions(stat) {
   if (stat === "score") return [
     { label: "1", value: 1 },
     { label: "2", value: 2 },
@@ -339,20 +339,15 @@ if (scope === "full") {
     { label: "2", value: 2 },
     { label: "3", value: 3 }
   ];
-if (stat === "gir") return [
-  { label: "Hit", value: true },
-  { label: "X", value: false }
-];
-
-if (stat === "fairway") return [
-  { label: "Hit", value: true },
-  { label: "X", value: false }
-];
-
-
-
-return [];
-
+  if (stat === "gir") return [
+    { label: "Hit", value: true },
+    { label: "X", value: false }
+  ];
+  if (stat === "fairway") return [
+    { label: "Hit", value: true },
+    { label: "X", value: false }
+  ];
+  return [];
 }
 
 
