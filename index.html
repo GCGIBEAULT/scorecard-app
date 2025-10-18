@@ -143,6 +143,32 @@ btn.onclick = () => {
 
   // Highlight the selected button
   btn.classList.add("selected");
+const data = roundData[hole];
+const entered = selectedStats.filter(s => data[s] !== undefined);
+
+if (entered.length === selectedStats.length) {
+  const parInput = document.getElementById(`par${hole}`);
+  const parValue = parseInt(parInput?.value);
+  if (parValue && !courseLayout[hole]) {
+    courseLayout[hole] = parValue;
+    localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+  }
+
+  localStorage.setItem("roundData", JSON.stringify(roundData));
+  currentHole = hole + 1;
+
+  const container = document.getElementById("hole-view");
+  container.innerHTML = "";
+
+  if (currentHole === 10) {
+    showSummary("front9");
+  } else if (currentHole <= totalHoles) {
+    renderHole(currentHole);
+  } else {
+    showSummary("back9");
+    showSummary("full");
+  }
+}
 
   advanceStatOrHole(stat);
 };
