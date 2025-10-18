@@ -1,39 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
   <title>Scorecard App</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* minimal styles so page is usable without external file */
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; padding: 18px; max-width: 900px; margin: 0 auto; }
+    #par-entry-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; padding: 8px 0; width: 100%; }
+    .hole-wrapper { display:flex; flex-direction:column; align-items:center; }
+    .par-input { width:100%; box-sizing:border-box; padding:6px; font-size:0.9rem; border:1px solid #ccc; border-radius:4px; transition: border-color .2s ease; }
+    .par-input:focus { outline: none; border-color:#007bff; }
+    .hole-block h2 { margin:0 0 8px 0; }
+  </style>
 </head>
 <body>
   <h1>Start Your Round</h1>
-<div id="top-running-status" class="running-status even"></div>
+
+  <div id="top-running-status" class="running-status even"></div>
 
   <label for="courseName"><strong>Course Name:</strong></label>
   <input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
-  <br><br>
+  <br/><br/>
 
   <label for="roundDate"><strong>Date:</strong></label>
   <input type="date" id="roundDate" />
-  <br><br>
+  <br/><br/>
 
   <label for="handicap"><strong>Handicap:</strong></label>
   <input type="number" id="handicap" />
-  <br><br>
+  <br/><br/>
 
   <div id="stat-selector">
-    <strong>Select Stats to Track:</strong><br>
-    <label><input type="checkbox" value="score" checked /> Score</label>
-    <label><input type="checkbox" value="putts" checked /> Putts</label>
-    <label><input type="checkbox" value="gir" checked /> GIR</label>
-    <label><input type="checkbox" value="fairway" checked /> Fairway</label>
-    <br><br>
+    <strong>Select Stats to Track:</strong><br/>
+    <label><input type="checkbox" value="score" checked/> Score</label>
+    <label><input type="checkbox" value="putts" checked/> Putts</label>
+    <label><input type="checkbox" value="gir" checked/> GIR</label>
+    <label><input type="checkbox" value="fairway" checked/> Fairway</label>
+    <br/><br/>
     <button onclick="startRound()">Start Round</button>
   </div>
 
   <section id="hole-view"></section>
-<section id="summary-block"></section>
+  <section id="summary-block"></section>
 
   <script>
     let currentHole = 1;
@@ -43,331 +52,127 @@
     let playerHandicap = null;
     let courseName = "";
     let roundDate = "";
-let courseLayout = {};
+    let courseLayout = {};
 
-   function startRound() {
-  courseName = document.getElementById("courseName").value.trim();
-  roundDate = document.getElementById("roundDate").value;
-  const dateInput = document.getElementById("roundDate");
-if (dateInput && dateInput.value) {
-  dateInput.blur();
-  dateInput.dispatchEvent(new Event("change", { bubbles: true }));
-}
-   
-  playerHandicap = parseInt(document.getElementById("handicap").value, 10);
-  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
-
-  // Wipe ghost layout and reset
-const savedLayout = localStorage.getItem(`layout_${courseName}`);
-courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
-
-
-  // Initialize round
-  currentHole = 1;
-  document.getElementById("stat-selector").style.display = "none";
-  renderHole(currentHole);
-}
-
-function renderHole(hole) {
-  const container = document.getElementById("hole-view");
-  const holeBlock = document.createElement("div");
-  holeBlock.className = "hole-block";
-  holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
-
-  // Only inject grid if layout is incomplete
-if (Object.keys(courseLayout).length < 18) {
-  const grid = document.createElement("div");
-  grid.id = "par-entry-grid";
-  grid.style.display = "grid";
-  grid.style.gridTemplateColumns = "repeat(9, 1fr)";
-  grid.style.gap = "6px";
-  grid.style.padding = "8px 0";
-  grid.style.width = "100%";
-for ( let i = 1 ; i <= 18 ; i++ ) {
-  const wrapper = document.createElement("div");
-  wrapper.style.display = "flex";
-  wrapper.style.flexDirection = "column";
-  wrapper.style.alignItems = "center";
-  const input = document.createElement("input");
-  input.type = "number";
-  input.min = 3;
-  input.max = 5;
-  input.className = "par-input";
-  input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
-  input.placeholder = ` ${ i } `;
-  input.autocomplete = "off";
-  input.style.width = "100%";
-  input.style.boxSizing = "border-box";
-  input.style.padding = "6px";
-  input.style.fontSize = "0.9rem";
-  input.style.border = "1px solid #ccc";
-  input.style.borderRadius = "4px";
-  input.style.transition = "border-color 0.2s ease";
-  input.onmouseover = () => input.style.borderColor = "#007bff";
-  input.onmouseout = () => input.style.borderColor = "#ccc";
-  input.onchange = () => {
-    const val = parseInt(input.value, 10);
-    if (val >= 3 && val <= 5) {
-      courseLayout[i] = val;
-      if (i === hole) {
-        const parLabel = document.querySelector(".hole-label");
-        if (parLabel) parLabel.textContent = `Par ${val}`;
+    function startRound() {
+      courseName = document.getElementById("courseName").value.trim();
+      roundDate = document.getElementById("roundDate").value;
+      const dateInput = document.getElementById("roundDate");
+      if (dateInput && dateInput.value) {
+        dateInput.blur();
+        dateInput.dispatchEvent(new Event("change", { bubbles: true }));
       }
-      if (Object.keys(courseLayout).length === 18) {
-        grid.remove();
-        document.getElementById("hole-view").innerHTML = "";
-        renderHole(1);
-      }
+      playerHandicap = parseInt(document.getElementById("handicap").value, 10);
+      selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+
+      // Load saved layout for this course (if any)
+      const savedLayoutRaw = localStorage.getItem(`layout_${courseName}`);
+      courseLayout = savedLayoutRaw ? JSON.parse(savedLayoutRaw) : {};
+
+      currentHole = 1;
+      document.getElementById("stat-selector").style.display = "none";
+      renderHole(currentHole);
     }
-  };
-  wrapper.appendChild(input);
-  grid.appendChild(wrapper);
-}
 
+    function renderHole(hole) {
+      const container = document.getElementById("hole-view");
+      container.innerHTML = "";
+      const holeBlock = document.createElement("div");
+      holeBlock.className = "hole-block";
+      holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
+      container.appendChild(holeBlock);
 
-  holeBlock.appendChild(grid);
-}
+      // Only inject grid if layout is incomplete
+      if (Object.keys(courseLayout).length < 18) {
+        const grid = document.createElement("div");
+        grid.id = "par-entry-grid";
 
+        for (let i = 1; i <= 18; i++) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "hole-wrapper";
 
-  // Display par if known
-  if (hole === 1 || courseLayout[hole]) {
-    const parDisplay = document.createElement("h2");
-    parDisplay.className = "hole-label";
-    parDisplay.style.marginTop = "0.5em";
-    parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
-    holeBlock.appendChild(parDisplay);
-  }
+          const input = document.createElement("input");
+          input.type = "number";
+          input.min = 3;
+          input.max = 5;
+          input.className = "par-input";
+          input.name = `par${i}`;
+          input.setAttribute("data-hole", String(i));
+          input.autocomplete = "off";
+          input.autocorrect = "off";
+          input.autocapitalize = "off";
+          input.spellcheck = false;
+          input.inputMode = "numeric";
 
-  // Inject stat buttons
-  selectedStats.forEach(stat => {
-    const statBlock = document.createElement("div");
-    statBlock.className = "stat-block";
-    statBlock.innerHTML = `<strong>${stat}</strong><br>`;
-    const options = getOptions(stat);
-    options.forEach(opt => {
-      const btn = document.createElement("button");
-      btn.textContent = opt.label;
-      btn.onclick = () => recordStat(hole, stat, opt.value);
-      statBlock.appendChild(btn);
-    });
-    holeBlock.appendChild(statBlock);
-  });
+          // Use saved value if present; otherwise for first row (1..9) prefill the visible value to the hole number,
+          // but keep it editable and allow onchange to overwrite and persist.
+          if (courseLayout[i] !== undefined && courseLayout[i] !== null && courseLayout[i] !== "") {
+            input.value = courseLayout[i];
+          } else {
+            // Only prefill visible value for first row to mirror 10-18 behavior and avoid autofill surprises.
+            input.value = (i <= 9) ? String(i) : "";
+          }
 
-  container.appendChild(holeBlock);
-}
+          input.placeholder = `${i}`;
 
-function advanceStatOrHole(lastStat) {
-  const stats = selectedStats;
-  const data = roundData[currentHole] || {};
-  const entered = stats.filter(stat => data[stat] !== undefined);
+          input.style.width = "100%";
+          input.style.boxSizing = "border-box";
+          input.style.padding = "6px";
+          input.style.fontSize = "0.9rem";
+          input.style.border = "1px solid #ccc";
+          input.style.borderRadius = "4px";
+          input.style.transition = "border-color 0.2s ease";
 
-  if (entered.length === stats.length) {
-    if (!courseLayout[currentHole]) {
-      const parInput = document.getElementById(`par${currentHole}`);
-      const parValue = parseInt(parInput?.value);
-      if (parValue) {
-        courseLayout[currentHole] = parValue;
-        localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+          input.onmouseover = () => input.style.borderColor = "#007bff";
+          input.onmouseout = () => input.style.borderColor = "#ccc";
+
+          input.onchange = () => {
+            const val = parseInt(input.value, 10);
+            if (!isNaN(val) && val >= 3 && val <= 5) {
+              courseLayout[i] = val;
+              // persist layout immediately
+              if (courseName) {
+                localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+              }
+              if (i === hole) {
+                const parLabel = document.querySelector(".hole-label");
+                if (parLabel) parLabel.textContent = `Par ${val}`;
+              }
+              if (Object.keys(courseLayout).length === 18) {
+                // full layout saved; re-render hole view
+                grid.remove();
+                document.getElementById("hole-view").innerHTML = "";
+                renderHole(1);
+              }
+            } else {
+              // invalid or cleared value: remove saved entry so it can be re-edited
+              delete courseLayout[i];
+              if (courseName) {
+                localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+              }
+            }
+          };
+
+          wrapper.appendChild(input);
+          grid.appendChild(wrapper);
+        }
+
+        holeBlock.appendChild(grid);
+      } else {
+        // layout complete: you can render the normal hole UI here
+        const done = document.createElement("div");
+        done.textContent = "Course layout complete.";
+        holeBlock.appendChild(done);
       }
     }
 
-    localStorage.setItem("roundData", JSON.stringify(roundData));
-    const container = document.getElementById("hole-view");
-    container.innerHTML = "";
-
-currentHole++;
-
-if (currentHole === 10) {
-  showSummary("front9");
-  return; // ⛔ Prevents Hole 10 from rendering immediately
-}
-
-if (currentHole <= totalHoles) {
-  renderHole(currentHole);
-    } else {
-      showSummary("back9");
-      showSummary("full");
-    }
-  } // ✅ Closes: if (entered.length === stats.length)
-}   // ✅ Closes: function advanceStatOrHole
-function saveRoundToLocal(roundData, courseLayout) {
-  const course = document.getElementById("course-name")?.value || "Unnamed Course";
-  const date = document.getElementById("round-date")?.value || new Date().toLocaleDateString();
-  const handicap = document.getElementById("handicap")?.value || "N/A";
-
-  const savedRounds = JSON.parse(localStorage.getItem("rounds") || "[]");
-
-  savedRounds.push({
-    course,
-    date,
-    handicap,
-    courseLayout,
-    roundData
-  });
-
-  localStorage.setItem("rounds", JSON.stringify(savedRounds));
-}
-
-function showSummary(scope = "front9") {
-  let holes = [];
-
-  if (scope === "front9") {
-    holes = Array.from({ length: 9 }, (_, i) => i + 1);
-  } else if (scope === "back9") {
-    holes = Array.from({ length: 9 }, (_, i) => i + 10);
-  } else if (scope === "full") {
-    holes = Array.from({ length: 18 }, (_, i) => i + 1);
-  }
-
-  let totalScore = 0;
-  let totalPar = 0;
-  let totalPutts = 0;
-  let girHits = 0;
-  let fairwayHits = 0;
-  let fairwayEligible = 0;
-
-  holes.forEach(i => {
-    const holeData = roundData[i] || {};
-    const par = courseLayout[i];
-    const score = holeData.score;
-
-    if (typeof score === "number") totalScore += score;
-    if (typeof par === "number") totalPar += par;
-    if (typeof holeData.putts === "number") totalPutts += holeData.putts;
-    if (holeData.gir === true) girHits++;
-
-    if (typeof par === "number" && par > 3) {
-      fairwayEligible++;
-      if (holeData.fairway === true) fairwayHits++;
-    }
-  });
-
-  const diff = totalScore - totalPar;
-  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
-  const girPct = Math.round((girHits / holes.length) * 100);
-  const fairwayPct = fairwayEligible > 0 ? Math.round((fairwayHits / fairwayEligible) * 100) : 0;
-  const scopeLabel = scope === "full" ? "Full Round" : scope === "back9" ? "Back 9" : "Front 9";
-
-let summaryHTML = `
-  <div class="summary-block">
-    <h2>${scopeLabel} Summary</h2>
-    <p><strong>Score:</strong> ${totalScore} (${overUnder})</p>
-    <p><strong>Putts:</strong> ${totalPutts}</p>
-    <p><strong>GIRs:</strong> ${girHits} (${girPct}%)</p>
-    <p><strong>Fairways:</strong> ${fairwayHits} of ${fairwayEligible} (${fairwayPct}%)</p>
-    ${scope === "front9" ? `
-      <div class="next-block">
-        <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
-      </div>
-    ` : ""}
- </div>
-`;
-
-if (scope === "full") {
-  const frontHoles = Array.from({ length: 9 }, (_, i) => i + 1);
-  const backHoles = Array.from({ length: 9 }, (_, i) => i + 10);
-
-  function getSegmentStats(segment) {
-    let score = 0, putts = 0, girs = 0, fairways = 0, fairwayEligible = 0;
-    segment.forEach(i => {
-      const hole = roundData[i] || {};
-      const par = courseLayout[i];
-      if (typeof hole.score === "number") score += hole.score;
-      if (typeof hole.putts === "number") putts += hole.putts;
-      if (hole.gir === true) girs++;
-      if (typeof par === "number" && par > 3) {
-        fairwayEligible++;
-        if (hole.fairway === true) fairways++;
-      }
-    });
-    return {
-      score,
-      putts,
-      girs,
-      girPct: Math.round((girs / segment.length) * 100),
-      fairways,
-      fairwayPct: fairwayEligible > 0 ? Math.round((fairways / fairwayEligible) * 100) : 0
+    // Optional helper: expose a debug function on window to inspect saved layouts
+    window.debugLayouts = function() {
+      return Object.keys(localStorage).filter(k => k.startsWith('layout_')).map(k => ({ k, v: JSON.parse(localStorage.getItem(k)) }));
     };
-  }
 
-  const frontStats = getSegmentStats(frontHoles);
-  const backStats = getSegmentStats(backHoles);
-
-  summaryHTML += `
-    <div class="split-summary">
-      <p><strong>Front 9:</strong> ${frontStats.score} | Putts: ${frontStats.putts} | GIRs: ${frontStats.girs} (${frontStats.girPct}%) | Fairways: ${frontStats.fairways} (${frontStats.fairwayPct}%)</p>
-      <p><strong>Back 9:</strong> ${backStats.score} | Putts: ${backStats.putts} | GIRs: ${backStats.girs} (${backStats.girPct}%) | Fairways: ${backStats.fairways} (${backStats.fairwayPct}%)</p>
-    </div>
-  `;
-}
-
-
-  
-
-  document.getElementById("summary-block").innerHTML = summaryHTML;
-}
-
-     
-
-
-
-
-
-  function getOptions(stat) {
-  if (stat === "score") return [
-    { label: "1", value: 1 },
-    { label: "2", value: 2 },
-    { label: "3", value: 3 },
-    { label: "4", value: 4 },
-    { label: "5", value: 5 },
-    { label: "6", value: 6 },
-    { label: "7", value: 7 },
-    { label: "8", value: 8 }
-  ];
-  if (stat === "putts") return [
-    { label: "0", value: 0 },
-    { label: "1", value: 1 },
-    { label: "2", value: 2 },
-    { label: "3", value: 3 }
-  ];
-if (stat === "gir") return [
-  { label: "Hit", value: true },
-  { label: "X", value: false }
-];
-
-if (stat === "fairway") return [
-  { label: "Hit", value: true },
-  { label: "X", value: false }
-];
-
-
-
-return [];
-
-}
-
-
-if (scope === "front9") {
-  const diff = totalScore - totalPar;
-  const overUnder = diff === 0 ? "Even" : diff > 0 ? `+${diff}` : `${diff}`;
-
-  let summaryHTML = `
-    <div class="summary-block">
-      <h2>Front 9 Summary</h2>
-      <p><strong>Score:</strong> ${totalScore} (${overUnder})</p>
-      <p><strong>Putts:</strong> ${totalPutts}</p>
-      <p><strong>GIRs:</strong> ${girHits}</p>
-      <p><strong>Fairways:</strong> ${fairwayHits}</p>
-      <div class="next-block">
-        <button class="stat-btn" onclick="renderHole(10)">Play Back 9</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById("summary-block").innerHTML = summaryHTML;
-}
-
-
+    // If you want the page to auto-start for quick testing, uncomment:
+    // startRound();
   </script>
 </body>
 </html>
