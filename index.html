@@ -35,6 +35,14 @@
 
   <section id="hole-view"></section>
   <section id="summary-block"></section>
+const roundData = {};
+
+function recordStat(hole, stat, value) {
+  if (!roundData[hole]) {
+    roundData[hole] = {};
+  }
+  roundData[hole][stat] = value;
+}
 
   <script src="script.js"></script>
 </body>
