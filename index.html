@@ -67,6 +67,43 @@ courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
   document.getElementById("stat-selector").style.display = "none";
   renderHole(currentHole);
 }
+function handlePar18Commit() {
+  const par18 = document.getElementById('par-18');
+  if (!par18) return;
+
+  const commit = () => {
+    const raw = (par18.value || '').trim();
+    const num = Number(raw);
+    if (!Number.isInteger(num) || num < 3 || num > 6) return;
+
+    roundData.pars = roundData.pars || {};
+    roundData.pars[18] = num;
+
+    const grid = document.querySelector('.par-grid') || document.querySelector('.par-row');
+    if (grid) grid.remove();
+
+    currentHole = 1;
+    renderHole(currentHole);
+
+    const status = document.getElementById('top-running-status');
+    if (status) status.textContent = `Par 18 saved: ${num}. Starting Hole 1.`;
+  };
+
+  par18.removeEventListener('blur', par18._par18Handler || (() => {}));
+  par18.removeEventListener('keydown', par18._par18Key || (() => {}));
+
+  par18._par18Handler = commit;
+  par18._par18Key = function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      commit();
+      par18.blur();
+    }
+  };
+
+  par18.addEventListener('blur', par18._par18Handler);
+  par18.addEventListener('keydown', par18._par18Key);
+}
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
