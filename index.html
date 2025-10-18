@@ -374,6 +374,51 @@ if (scope === "front9") {
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
 }
+<script>
+let currentHole = 1;
+let inputCount = 0;
+
+function lockInput(category, value) {
+  const blockId = `${category}${currentHole}-${value}`;
+  const blocks = document.querySelectorAll(`.${category}${currentHole}`);
+  
+  blocks.forEach(block => block.classList.remove("selected"));
+  
+  const selectedBlock = document.getElementById(blockId);
+  if (selectedBlock) {
+    selectedBlock.classList.add("selected");
+    inputCount++;
+    
+    if (inputCount === 4) {
+      inputCount = 0;
+      currentHole++;
+      scrollToHole(currentHole);
+    }
+  } else {
+    console.error("Block not found:", blockId);
+  }
+}
+
+function scrollToHole(holeNumber) {
+  const holeHeader = document.getElementById(`hole${holeNumber}`);
+  if (holeHeader) {
+    holeHeader.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  ["score", "putts", "gir", "fairway"].forEach(category => {
+    for (let hole = 1; hole <= 18; hole++) {
+      const blocks = document.querySelectorAll(`.${category}${hole}`);
+      blocks.forEach(block => {
+        const value = block.textContent.trim();
+        block.id = `${category}${hole}-${value}`;
+        block.addEventListener("click", () => lockInput(category, value));
+      });
+    }
+  });
+});
+</script>
 
 
   </script>
