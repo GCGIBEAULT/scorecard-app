@@ -100,7 +100,8 @@ if (Object.keys(courseLayout).length < 18) {
     input.min = 3;
     input.max = 5;
     input.className = "par-input";
-    input.value = courseLayout[i] ?? "";
+    input.value = i === 1 ? "1" : (courseLayout[i] !== undefined ? courseLayout[i] : "");
+
 
     input.style.width = "100%";
     input.style.boxSizing = "border-box";
