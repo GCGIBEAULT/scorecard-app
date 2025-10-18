@@ -43,6 +43,35 @@ function recordStat(hole, stat, value) {
   }
   roundData[hole][stat] = value;
 }
+document.getElementById("show-summary").addEventListener("click", () => {
+  const summaryBlock = document.getElementById("summary-block");
+  summaryBlock.innerHTML = ""; // clear previous summary
+
+  Object.keys(roundData).forEach(hole => {
+    const holeSummary = document.createElement("div");
+    holeSummary.className = "hole-summary";
+
+    const header = document.createElement("h3");
+    header.textContent = `Hole ${hole}`;
+    holeSummary.appendChild(header);
+
+    const stats = roundData[hole];
+    Object.keys(stats).forEach(stat => {
+      const value = stats[stat];
+      const labelMap = {
+        score: "Score",
+        putts: "Putts",
+        gir: "Greens in Regulation",
+        fairway: "Fairway Hit"
+      };
+      const statLine = document.createElement("p");
+      statLine.textContent = `${labelMap[stat] || stat}: ${value}`;
+      holeSummary.appendChild(statLine);
+    });
+
+    summaryBlock.appendChild(holeSummary);
+  });
+});
 
   <script src="script.js"></script>
 </body>
