@@ -9,6 +9,22 @@
 <body>
   <h1>Start Your Round</h1>
 <div id="top-running-status" class="running-status even"></div>
+<div id="top-running-status" class="running-status even"></div>
+
+<!-- Par Entry Block: 9 across, 9 below -->
+<div id="par-entry-container">
+  <div class="par-row" id="front-nine">
+    <div class="par-block" data-hole="1"><input type="number" placeholder="Par 1"></div>
+    <!-- Repeat through 9 -->
+  </div>
+  <div class="par-row" id="back-nine">
+    <div class="par-block" data-hole="10"><input type="number" placeholder="Par 10"></div>
+    <!-- Repeat through 18 -->
+  </div>
+</div>
+
+<label for="courseName"><strong>Course Name:</strong></label>
+<input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
 
   <label for="courseName"><strong>Course Name:</strong></label>
   <input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
@@ -368,6 +384,20 @@ if (scope === "front9") {
   `;
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
+}
+.par-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.par-block {
+  flex: 1;
+  margin: 0 4px;
+}
+.par-block input {
+  width: 100%;
+  padding: 6px;
+  font-size: 1rem;
 }
 
 
