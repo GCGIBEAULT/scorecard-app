@@ -125,3 +125,25 @@ button.selected {
 .row-4 {
   grid-template-columns: repeat(4, 1fr);
 }
+.stat-button {
+  padding: 6px 10px;
+  margin: 4px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  background: #eee;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.stat-button:hover {
+  background: #007BFF; /* Light blue on hover */
+  color: white;
+}
+
+.stat-button.locked {
+  background: #004080; /* Dark blue when locked */
+  color: white;
+  cursor: not-allowed;
+  opacity: 1;
+}
