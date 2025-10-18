@@ -125,3 +125,27 @@ button.selected {
 .row-4 {
   grid-template-columns: repeat(4, 1fr);
 }
+#saved-rounds-block {
+  margin-top: 2em;
+  padding: 1em;
+  border-top: 2px solid #ccc;
+}
+
+.saved-round {
+  margin-bottom: 1em;
+  padding: 0.5em;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.saved-round p {
+  margin: 0.25em 0;
+}
+
+.saved-round button {
+  margin-top: 0.5em;
+  padding: 0.4em 0.8em;
+  font-size: 0.9em;
+  cursor: pointer;
+}
