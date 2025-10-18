@@ -100,7 +100,8 @@ if (Object.keys(courseLayout).length < 18) {
     input.min = 3;
     input.max = 5;
     input.className = "par-input";
-input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
+input.value = courseLayout[i] !== undefined ? courseLayout[i] : `${i}`;
+
 input.placeholder = `${i}`;
 
 
