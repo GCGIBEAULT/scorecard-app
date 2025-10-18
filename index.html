@@ -75,6 +75,12 @@ function renderHole(hole) {
   const holeBlock = document.createElement("div");
   holeBlock.className = "hole-block";
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
+  const runningScore = getRunningScore(hole);
+const scoreStatus = document.createElement("p");
+scoreStatus.className = "running-score";
+scoreStatus.textContent = `Score to Par: ${runningScore}`;
+holeBlock.appendChild(scoreStatus);
+
 // Only inject grid if layout is incomplete
 if (Object.keys(courseLayout).length < 18) {
   const grid = document.createElement("div");
