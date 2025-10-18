@@ -35,14 +35,7 @@
 
   <section id="hole-view"></section>
   <section id="summary-block"></section>
-const roundData = {};
 
-function recordStat(hole, stat, value) {
-  if (!roundData[hole]) {
-    roundData[hole] = {};
-  }
-  roundData[hole][stat] = value;
-}
 document.getElementById("show-summary").addEventListener("click", () => {
   const summaryBlock = document.getElementById("summary-block");
   summaryBlock.innerHTML = ""; // clear previous summary
@@ -72,6 +65,84 @@ document.getElementById("show-summary").addEventListener("click", () => {
     summaryBlock.appendChild(holeSummary);
   });
 });
+<script>
+  const roundData = {};
+
+  function recordStat(hole, stat, value) {
+    if (!roundData[hole]) {
+      roundData[hole] = {};
+    }
+    roundData[hole][stat] = value;
+  }
+
+  function startRound() {
+    const selectedStats = Array.from(document.querySelectorAll('#stat-selector input[type="checkbox"]:checked')).map(cb => cb.value);
+    const holeView = document.getElementById("hole-view");
+    holeView.innerHTML = "";
+
+    for (let hole = 1; hole <= 18; hole++) {
+      const holeBlock = document.createElement("div");
+      holeBlock.className = "hole-block";
+
+      const holeHeader = document.createElement("h2");
+      holeHeader.textContent = `Hole ${hole}`;
+      holeBlock.appendChild(holeHeader);
+
+      selectedStats.forEach(stat => {
+        const statBlock = document.createElement("div");
+        statBlock.className = "stat-block";
+
+        const labelMap = {
+          score: "Score",
+          putts: "Putts",
+          gir: "Greens in Regulation",
+          fairway: "Fairway Hit"
+        };
+
+        statBlock.innerHTML = `<strong>${labelMap[stat] || stat}</strong><br>
+          <button onclick="recordStat(${hole}, '${stat}', 1)">1</button>
+          <button onclick="recordStat(${hole}, '${stat}', 2)">2</button>
+          <button onclick="recordStat(${hole}, '${stat}', 3)">3</button>
+          <button onclick="recordStat(${hole}, '${stat}', 4)">4</button>
+          <button onclick="recordStat(${hole}, '${stat}', 5)">5</button>`;
+
+        holeBlock.appendChild(statBlock);
+      });
+
+      holeView.appendChild(holeBlock);
+    }
+  }
+
+  document.getElementById("show-summary").addEventListener("click", () => {
+    const summaryBlock = document.getElementById("summary-block");
+    summaryBlock.innerHTML = "";
+
+    Object.keys(roundData).forEach(hole => {
+      const holeSummary = document.createElement("div");
+      holeSummary.className = "hole-summary";
+
+      const header = document.createElement("h3");
+      header.textContent = `Hole ${hole}`;
+      holeSummary.appendChild(header);
+
+      const stats = roundData[hole];
+      Object.keys(stats).forEach(stat => {
+        const value = stats[stat];
+        const labelMap = {
+          score: "Score",
+          putts: "Putts",
+          gir: "Greens in Regulation",
+          fairway: "Fairway Hit"
+        };
+        const statLine = document.createElement("p");
+        statLine.textContent = `${labelMap[stat] || stat}: ${value}`;
+        holeSummary.appendChild(statLine);
+      });
+
+      summaryBlock.appendChild(holeSummary);
+    });
+  });
+</script>
 
   <script src="script.js"></script>
 </body>
