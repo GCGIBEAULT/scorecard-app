@@ -71,91 +71,94 @@ courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
+  container.innerHTML = "";
+
   const holeBlock = document.createElement("div");
   holeBlock.className = "hole-block";
-  holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
-  // Only inject grid if layout is incomplete
-if (Object.keys(courseLayout).length < 18) {
-  const grid = document.createElement("div");
-  grid.id = "par-entry-grid";
-  grid.style.display = "grid";
-  grid.style.gridTemplateColumns = "repeat(9, 1fr)";
-  grid.style.gap = "6px";
-  grid.style.padding = "8px 0";
-  grid.style.width = "100%";
-for ( let i = 1 ; i <= 18 ; i++ ) {
-  const wrapper = document.createElement("div");
-  wrapper.style.display = "flex";
-  wrapper.style.flexDirection = "column";
-  wrapper.style.alignItems = "center";
-  const input = document.createElement("input");
-  input.type = "number";
-  input.min = 3;
-  input.max = 5;
-  input.className = "par-input";
-  input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
-  input.placeholder = ` ${ i } `;
-  input.autocomplete = "off";
-  input.style.width = "100%";
-  input.style.boxSizing = "border-box";
-  input.style.padding = "6px";
-  input.style.fontSize = "0.9rem";
-  input.style.border = "1px solid #ccc";
-  input.style.borderRadius = "4px";
-  input.style.transition = "border-color 0.2s ease";
-  input.onmouseover = () => input.style.borderColor = "#007bff";
-  input.onmouseout = () => input.style.borderColor = "#ccc";
-  input.onchange = () => {
-    const val = parseInt(input.value, 10);
-    if (val >= 3 && val <= 5) {
-      courseLayout[i] = val;
-      if (i === hole) {
-        const parLabel = document.querySelector(".hole-label");
-        if (parLabel) parLabel.textContent = `Par ${val}`;
-      }
-      if (Object.keys(courseLayout).length === 18) {
-        grid.remove();
-        document.getElementById("hole-view").innerHTML = "";
-        renderHole(1);
-      }
+  const header = document.createElement("h2");
+  header.textContent = `Hole ${hole}`;
+  holeBlock.appendChild(header);
+
+  // Render par grid if not yet committed
+  if (!roundData.pars || Object.keys(roundData.pars).length < 18) {
+    const grid = document.createElement("div");
+    grid.className = "par-grid";
+    for (let i = 1; i <= 18; i++) {
+      const inp = document.createElement("input");
+      inp.className = "par-input";
+      inp.type = "number";
+      inp.min = 3;
+      inp.max = 6;
+      inp.placeholder = `Hole ${i}`;
+      inp.id = `par-${i}`;
+      if (roundData.pars?.[i]) inp.value = roundData.pars[i];
+      grid.appendChild(inp);
     }
-  };
-  wrapper.appendChild(input);
-  grid.appendChild(wrapper);
-}
-
-
-  holeBlock.appendChild(grid);
-}
-
-
-  // Display par if known
-  if (hole === 1 || courseLayout[hole]) {
-    const parDisplay = document.createElement("h2");
-    parDisplay.className = "hole-label";
-    parDisplay.style.marginTop = "0.5em";
-    parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
-    holeBlock.appendChild(parDisplay);
+    holeBlock.appendChild(grid);
+    handlePar18Commit(); // watches par-18 input and triggers hole 1
   }
 
   // Inject stat buttons
   selectedStats.forEach(stat => {
     const statBlock = document.createElement("div");
     statBlock.className = "stat-block";
-    statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+
+    const label = document.createElement("strong");
+    label.textContent = stat.toUpperCase();
+    statBlock.appendChild(label);
+    statBlock.appendChild(document.createElement("br"));
+
     const options = getOptions(stat);
     options.forEach(opt => {
       const btn = document.createElement("button");
+      btn.className = "stat-button";
       btn.textContent = opt.label;
-      btn.onclick = () => recordStat(hole, stat, opt.value);
+      btn.dataset.stat = stat;
+      btn.dataset.value = String(opt.value);
+
+      const handler = function (ev) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
+        if (!roundData[hole]) roundData[hole] = {};
+        if (roundData[hole][stat] !== undefined) return;
+
+        btn.classList.add("locked");
+        btn.disabled = true;
+        roundData[hole][stat] = opt.value;
+
+        const statusEl = document.getElementById("top-running-status");
+        if (statusEl) statusEl.textContent = `Hole ${hole} — recorded ${stat}: ${opt.label}`;
+
+        const entered = selectedStats.filter(s => roundData[hole][s] !== undefined);
+        if (entered.length === selectedStats.length) {
+          setTimeout(() => {
+            currentHole++;
+            if (currentHole <= totalHoles) {
+              renderHole(currentHole);
+            } else {
+              showSummary("full");
+            }
+          }, 300);
+        }
+
+        btn.removeEventListener("click", handler);
+      };
+
+      btn.addEventListener("click", handler);
       statBlock.appendChild(btn);
     });
+
     holeBlock.appendChild(statBlock);
   });
 
   container.appendChild(holeBlock);
+
+  const statusEl = document.getElementById("top-running-status");
+  if (statusEl) statusEl.textContent = `Hole ${hole} of ${totalHoles}`;
 }
+
 
 function advanceStatOrHole(lastStat) {
   const stats = selectedStats;
