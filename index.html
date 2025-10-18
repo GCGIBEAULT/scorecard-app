@@ -70,61 +70,71 @@ courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
+  container.innerHTML = ""; // 🧼 Clear previous hole block
 
   const holeBlock = document.createElement("div");
   holeBlock.className = "hole-block";
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
-// Only inject grid if layout is incomplete
-if (Object.keys(courseLayout).length < 18) {
-  const grid = document.createElement("div");
-  grid.id = "par-entry-grid";
 
-  const row1 = document.createElement("div");
-  row1.className = "par-row";
-  row1.id = "par-row-1";
+  // 🧱 Inject par-entry grid if layout is incomplete
+  if (Object.keys(courseLayout).length < 18) {
+    const grid = document.createElement("div");
+    grid.id = "par-entry-grid";
+    grid.style.display = "grid";
+    grid.style.gridTemplateColumns = "repeat(9, 1fr)";
+    grid.style.gap = "4px";
+    grid.style.minHeight = "200px"; // 🛡 Prevent collapse on mobile
 
-  const row2 = document.createElement("div");
-  row2.className = "par-row";
-  row2.id = "par-row-2";
+    const row1 = document.createElement("div");
+    row1.className = "par-row";
+    const row2 = document.createElement("div");
+    row2.className = "par-row";
 
-  grid.appendChild(row1);
-  grid.appendChild(row2);
-  holeBlock.appendChild(grid);
+    for (let i = 1; i <= 18; i++) {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = 3;
+      input.max = 5;
+      input.placeholder = `Hole ${i}`;
+      input.className = "par-input";
+      input.value = courseLayout[i] || "";
 
-  for (let i = 1; i <= 18; i++) {
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = 3;
-    input.max = 5;
-    input.placeholder = `Hole ${i}`;
-    input.className = "par-input";
-    input.value = courseLayout[i] || "";
-    input.onchange = () => {
-      const val = parseInt(input.value, 10);
-      if (val >= 3 && val <= 5) {
-        courseLayout[i] = val;
-        if (i === hole) {
-          const parLabel = document.querySelector(".hole-label");
-          if (parLabel) parLabel.textContent = `Par ${val}`;
+      input.onchange = () => {
+        const val = parseInt(input.value, 10);
+        if (val >= 3 && val <= 5) {
+          courseLayout[i] = val;
+
+          if (i === hole) {
+            const parLabel = document.querySelector(".hole-label");
+            if (parLabel) parLabel.textContent = `Par ${val}`;
+          }
+
+          if (Object.keys(courseLayout).length === 18) {
+            grid.remove(); // 🧼 Remove grid once complete
+            document.getElementById("hole-view").innerHTML = "";
+            renderHole(1); // 🔁 Restart at Hole 1
+          }
         }
-        if (Object.keys(courseLayout).length === 18) {
-          grid.remove(); // 🧼 Clean up once all 18 are entered
-        }
-      }
-    };
-    (i <= 9 ? row1 : row2).appendChild(input);
+      };
+
+      (i <= 9 ? row1 : row2).appendChild(input);
+    }
+
+    grid.appendChild(row1);
+    grid.appendChild(row2);
+    holeBlock.appendChild(grid);
   }
-}
 
-if (hole === 1 || courseLayout[hole]) {
-  const parDisplay = document.createElement("h2");
-  parDisplay.className = "hole-label"; // matches Hole X styling
-  parDisplay.style.marginTop = "0.5em"; // adds spacing
-  parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
-  holeBlock.appendChild(parDisplay);
-}
+  // 🏷 Show par label if available
+  if (hole === 1 || courseLayout[hole]) {
+    const parDisplay = document.createElement("h2");
+    parDisplay.className = "hole-label";
+    parDisplay.style.marginTop = "0.5em";
+    parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
+    holeBlock.appendChild(parDisplay);
+  }
 
-
+  // 📊 Inject stat buttons
   selectedStats.forEach(stat => {
     const statBlock = document.createElement("div");
     statBlock.className = "stat-block";
@@ -134,19 +144,15 @@ if (hole === 1 || courseLayout[hole]) {
     options.forEach(opt => {
       const btn = document.createElement("button");
       btn.textContent = opt.label;
-btn.onclick = () => {
-  if (!roundData[hole]) roundData[hole] = {};
-  roundData[hole][stat] = opt.value;
+      btn.onclick = () => {
+        if (!roundData[hole]) roundData[hole] = {};
+        roundData[hole][stat] = opt.value;
 
-  // Clear previous selection for this stat
-  Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
+        Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
 
-  // Highlight the selected button
-  btn.classList.add("selected");
-
-  advanceStatOrHole(stat);
-};
-
+        advanceStatOrHole(stat);
+      };
       statBlock.appendChild(btn);
     });
 
@@ -155,6 +161,7 @@ btn.onclick = () => {
 
   container.appendChild(holeBlock);
 }
+
 function advanceStatOrHole(lastStat) {
   const stats = selectedStats;
   const data = roundData[currentHole] || {};
