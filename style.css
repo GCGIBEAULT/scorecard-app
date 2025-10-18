@@ -1,81 +1,4 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 1em;
-  background-color: #f5f5f5;
-}
-
-h1, h2 {
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
-
-label {
-  display: block;
-  margin-top: 0.5em;
-}
-
-input, select {
-  padding: 0.4em;
-  margin-top: 0.2em;
-  margin-bottom: 0.8em;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button {
-  padding: 0.5em 1em;
-  font-size: 1em;
-  cursor: pointer;
-  background-color: #eee;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin: 0.3em 0.2em;
-}
-
-button:hover {
-  background-color: #ddd;
-}
-
-button:active {
-  background-color: #ccc;
-}
-
-#stat-selector {
-  margin-top: 1em;
-  padding: 1em;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-#hole-view {
-  margin-top: 2em;
-}
-
-.hole-block {
-  margin-bottom: 2em;
-  padding: 1em;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.stat-block {
-  margin-top: 1em;
-}
-
-.selected {
-  background-color: #cce5ff;
-  border-color: #66b0ff;
-}
-
-#par-entry-grid {
-  display: flex;
-  flex-direction: column;
-  margin-top: 1em;
-}
-
+/* Restore grid layout for par entry */
 .par-row {
   display: flex;
   justify-content: space-between;
@@ -83,59 +6,37 @@ button:active {
 }
 
 .par-input {
-  width: 5em;
+  width: 3em;
   padding: 0.4em;
   text-align: center;
 }
 
-.hole-label {
-  font-size: 1.2em;
-  margin-top: 0.5em;
-}
-
-.running-score {
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  color: #333;
-}
-
-.summary-block {
-  margin-top: 2em;
+/* Restore form styling */
+#start-round-form {
+  margin-top: 1em;
   padding: 1em;
-  background-color: #f9f9f9;
+  background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.next-block {
-  margin-top: 1em;
+#start-round-form h2 {
+  margin-top: 0;
+  font-size: 1.4em;
 }
 
-.split-summary p {
-  margin: 0.5em 0;
-}
-
-#saved-rounds-block {
-  margin-top: 2em;
-  padding: 1em;
-  border-top: 2px solid #ccc;
-}
-
-.saved-round {
-  margin-bottom: 1em;
-  padding: 0.5em;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.saved-round p {
-  margin: 0.25em 0;
-}
-
-.saved-round button {
+#start-round-form label {
+  display: block;
   margin-top: 0.5em;
-  padding: 0.4em 0.8em;
-  font-size: 0.9em;
-  cursor: pointer;
+  font-weight: bold;
+}
+
+#start-round-form input,
+#start-round-form select {
+  width: 100%;
+  padding: 0.4em;
+  margin-top: 0.2em;
+  margin-bottom: 0.8em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
