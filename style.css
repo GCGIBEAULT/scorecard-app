@@ -99,3 +99,21 @@ button.selected {
   padding: 6px;
   font-size: 1rem;
 }
+/* ──────────────────────────────── */
+/* Mobile Grid Override: 5+4 x 2   */
+/* ──────────────────────────────── */
+.par-row:nth-child(1),
+.par-row:nth-child(3) {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.par-row:nth-child(2),
+.par-row:nth-child(4) {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
