@@ -8,7 +8,6 @@
 </head>
 <body>
   <h1>Start Your Round</h1>
-<div id="top-running-status" class="running-status even"></div>
 
   <label for="courseName"><strong>Course Name:</strong></label>
   <input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
@@ -83,8 +82,7 @@ function recordStat(hole, stat, value) {
   });
 
   // Update status
-  const statusEl = document.getElementById("top-running-status");
-  if (statusEl) statusEl.textContent = `Hole ${hole} — recorded ${stat}: ${value}`;
+
 
   // Check if all stats are recorded
   const entered = selectedStats.filter(s => roundData[hole][s] !== undefined);
@@ -116,8 +114,6 @@ function recordStat(hole, stat, value) {
   });
 
   // Update status
-  const statusEl = document.getElementById("top-running-status");
-  if (statusEl) statusEl.textContent = `Hole ${hole} — recorded ${stat}: ${value}`;
 
   // Check if all stats are recorded
   const entered = selectedStats.filter(s => roundData[hole][s] !== undefined);
