@@ -70,99 +70,81 @@ courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
-  const holeBlock = document.createElement("div");
-  holeBlock.className = "hole-block";
-  holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
+  container.innerHTML = "";
 
-  // Only inject grid if layout is incomplete
-if (Object.keys(courseLayout).length < 18) {
-  const grid = document.createElement("div");
-  grid.id = "par-entry-grid";
-  grid.style.display = "grid";
-  grid.style.gridTemplateColumns = "repeat(9, 1fr)";
-  grid.style.gap = "6px";
-  grid.style.padding = "8px 0";
-  grid.style.width = "100%";
-
+  // 18-block par grid (preserve history layout)
+  const parGrid = document.createElement('div');
+  parGrid.className = 'par-row';
   for (let i = 1; i <= 18; i++) {
-    const wrapper = document.createElement("div");
-    wrapper.style.display = "flex";
-    wrapper.style.flexDirection = "column";
-    wrapper.style.alignItems = "center";
-
-
-
-const input = document.createElement("input");
-input.type = "number";
-input.min = 3;
-input.max = 5;
-input.className = "par-input";
-input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
-input.placeholder = `${i}`;
-
-
-
-    input.style.width = "100%";
-    input.style.boxSizing = "border-box";
-    input.style.padding = "6px";
-    input.style.fontSize = "0.9rem";
-    input.style.border = "1px solid #ccc";
-    input.style.borderRadius = "4px";
-    input.style.transition = "border-color 0.2s ease";
-
-    input.onmouseover = () => input.style.borderColor = "#007bff";
-    input.onmouseout = () => input.style.borderColor = "#ccc";
-
-    input.onchange = () => {
-      const val = parseInt(input.value, 10);
-      if (val >= 3 && val <= 5) {
-        courseLayout[i] = val;
-        if (i === hole) {
-          const parLabel = document.querySelector(".hole-label");
-          if (parLabel) parLabel.textContent = `Par ${val}`;
-        }
-        if (Object.keys(courseLayout).length === 18) {
-          grid.remove();
-          document.getElementById("hole-view").innerHTML = "";
-          renderHole(1);
-        }
-      }
-    };
-
-    wrapper.appendChild(input);
-    grid.appendChild(wrapper);
+    const inp = document.createElement('input');
+    inp.className = 'par-input';
+    inp.type = 'number';
+    inp.min = 3; inp.max = 5;
+    inp.id = `par-${i}`;
+    if (roundData.pars && roundData.pars[i] !== undefined) inp.value = roundData.pars[i];
+    parGrid.appendChild(inp);
   }
+  container.appendChild(parGrid);
 
-  holeBlock.appendChild(grid);
-}
-
-
-  // Display par if known
-  if (hole === 1 || courseLayout[hole]) {
-    const parDisplay = document.createElement("h2");
-    parDisplay.className = "hole-label";
-    parDisplay.style.marginTop = "0.5em";
-    parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
-    holeBlock.appendChild(parDisplay);
-  }
-
-  // Inject stat buttons
+  // active stat groups
   selectedStats.forEach(stat => {
-    const statBlock = document.createElement("div");
-    statBlock.className = "stat-block";
-    statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+    const group = document.createElement('div');
+    group.className = 'stat-block';
+
+    const label = document.createElement('div');
+    label.textContent = stat.toUpperCase();
+    label.style.fontWeight = 'bold';
+    group.appendChild(label);
+
     const options = getOptions(stat);
     options.forEach(opt => {
-      const btn = document.createElement("button");
+      const btn = document.createElement('button');
+      btn.type = 'button';                 // critical: no implicit submit
+      btn.className = 'stat-button';
       btn.textContent = opt.label;
-      btn.onclick = () => recordStat(hole, stat, opt.value);
-      statBlock.appendChild(btn);
+      btn.dataset.stat = stat;
+      btn.dataset.value = (opt.value !== undefined) ? String(opt.value) : String(opt.label);
+
+      const handler = function (ev) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();     // prevents global handlers from seeing this click
+        if (btn.classList.contains('locked')) return;
+        btn.classList.add('locked');
+        btn.disabled = true;
+
+        if (!roundData[hole]) roundData[hole] = {};
+        roundData[hole][stat] = btn.dataset.value;
+
+        // persist par if present
+        const parInput = document.getElementById(`par-${hole}`);
+        if (parInput && parInput.value) {
+          roundData.pars = roundData.pars || {};
+          roundData.pars[hole] = parInput.value;
+        }
+
+        // update status text only; do NOT advance hole
+        const statusEl = document.getElementById('top-running-status');
+        if (statusEl) statusEl.textContent = `Hole ${currentHole} of ${totalHoles} — recorded ${stat}: ${btn.dataset.value}`;
+
+        btn.removeEventListener('click', handler);
+      };
+
+      btn.addEventListener('click', handler);
+      group.appendChild(btn);
     });
-    holeBlock.appendChild(statBlock);
+
+    container.appendChild(group);
   });
 
-  container.appendChild(holeBlock);
+  // ensure start button is non-submit in DOM
+  const startBtn = document.querySelector('#stat-selector button');
+  if (startBtn) startBtn.type = 'button';
+
+  // update header status only
+  const statusEl = document.getElementById('top-running-status');
+  if (statusEl) statusEl.textContent = `Hole ${hole} of ${totalHoles}`;
 }
+
 
 function advanceStatOrHole(lastStat) {
   const stats = selectedStats;
