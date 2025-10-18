@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,7 +69,101 @@ courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
   renderHole(currentHole);
 }
 
+function renderHole(hole) {
+  const container = document.getElementById("hole-view");
+  const holeBlock = document.createElement("div");
+  holeBlock.className = "hole-block";
+  holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
+  // Only inject grid if layout is incomplete
+if (Object.keys(courseLayout).length < 18) {
+  const grid = document.createElement("div");
+  grid.id = "par-entry-grid";
+  grid.style.display = "grid";
+  grid.style.gridTemplateColumns = "repeat(9, 1fr)";
+  grid.style.gap = "6px";
+  grid.style.padding = "8px 0";
+  grid.style.width = "100%";
+
+  for (let i = 1; i <= 18; i++) {
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.flexDirection = "column";
+    wrapper.style.alignItems = "center";
+
+
+
+const input = document.createElement("input");
+input.type = "number";
+input.min = 3;
+input.max = 5;
+input.className = "par-input";
+input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
+input.placeholder = `${i}`;
+
+
+
+    input.style.width = "100%";
+    input.style.boxSizing = "border-box";
+    input.style.padding = "6px";
+    input.style.fontSize = "0.9rem";
+    input.style.border = "1px solid #ccc";
+    input.style.borderRadius = "4px";
+    input.style.transition = "border-color 0.2s ease";
+
+    input.onmouseover = () => input.style.borderColor = "#007bff";
+    input.onmouseout = () => input.style.borderColor = "#ccc";
+
+    input.onchange = () => {
+      const val = parseInt(input.value, 10);
+      if (val >= 3 && val <= 5) {
+        courseLayout[i] = val;
+        if (i === hole) {
+          const parLabel = document.querySelector(".hole-label");
+          if (parLabel) parLabel.textContent = `Par ${val}`;
+        }
+        if (Object.keys(courseLayout).length === 18) {
+          grid.remove();
+          document.getElementById("hole-view").innerHTML = "";
+          renderHole(1);
+        }
+      }
+    };
+
+    wrapper.appendChild(input);
+    grid.appendChild(wrapper);
+  }
+
+  holeBlock.appendChild(grid);
+}
+
+
+  // Display par if known
+  if (hole === 1 || courseLayout[hole]) {
+    const parDisplay = document.createElement("h2");
+    parDisplay.className = "hole-label";
+    parDisplay.style.marginTop = "0.5em";
+    parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
+    holeBlock.appendChild(parDisplay);
+  }
+
+  // Inject stat buttons
+  selectedStats.forEach(stat => {
+    const statBlock = document.createElement("div");
+    statBlock.className = "stat-block";
+    statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+    const options = getOptions(stat);
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt.label;
+      btn.onclick = () => recordStat(hole, stat, opt.value);
+      statBlock.appendChild(btn);
+    });
+    holeBlock.appendChild(statBlock);
+  });
+
+  container.appendChild(holeBlock);
+}
 
 function advanceStatOrHole(lastStat) {
   const stats = selectedStats;
@@ -280,57 +375,6 @@ if (scope === "front9") {
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
 }
-<script>
-  function renderAllHoles() {
-    const container = document.getElementById("hole-view");
-    container.innerHTML = ""; // Clear any existing content
-
-    for (let i = 1; i <= 18; i++) {
-      const block = document.createElement("div");
-      block.className = "stat-block";
-
-      block.innerHTML = `
-        <h3>Hole ${i}</h3>
-        <label>Par: <input type="number" class="par-input" name="par-${i}" min="3" max="5"></label>
-        <label>Score: <input type="number" name="score-${i}" min="1" max="10"></label>
-        <label>Putts: <input type="number" name="putts-${i}" min="0" max="4"></label>
-        <label>GIR: <input type="checkbox" name="gir-${i}"></label>
-        <label>Fairway Hit: <input type="checkbox" name="fairway-${i}"></label>
-      `;
-
-      container.appendChild(block);
-    }
-  }
-
-function renderParEntryGrid() {
-  const container = document.getElementById("hole-view");
-  container.innerHTML = "";
-
-  const grid = document.createElement("div");
-  grid.id = "par-entry-grid";
-  grid.className = "par-row";
-
-  for (let i = 1; i <= 18; i++) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "par-input";
-
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = "3";
-    input.max = "5";
-    input.placeholder = `Hole ${i}`;
-    input.id = `par-${i}`;
-
-    wrapper.appendChild(input);
-    grid.appendChild(wrapper);
-  }
-
-  container.appendChild(grid);
-}
-
-// ✅ Call it once, cleanly
-window.onload = renderParEntryGrid;
-
 
 
   </script>
