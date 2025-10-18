@@ -416,6 +416,14 @@ if (scope === "front9") {
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("startRound").addEventListener("click", startRound);
 });
+document.addEventListener("DOMContentLoaded", () => {
+  const startBtn = document.getElementById("startRound");
+  if (startBtn) {
+    startBtn.addEventListener("click", startRound);
+  } else {
+    console.error("Start Round button not found.");
+  }
+});
 
   </script>
 </body>
