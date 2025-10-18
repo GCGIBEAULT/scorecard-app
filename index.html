@@ -56,44 +56,47 @@
       renderHole(currentHole);
     }
 
-    function renderHole(hole) {
-      const container = document.getElementById("hole-view");
-      container.innerHTML = "";
+function renderHole(hole) {
+  const container = document.getElementById("hole-view");
+  container.innerHTML = "";
 
-      selectedStats.forEach(stat => {
-        const group = document.createElement("div");
-        group.className = "button-group";
+  selectedStats.forEach(stat => {
+    const group = document.createElement("div");
+    group.className = "button-group";
 
-        const label = document.createElement("div");
-        label.textContent = stat.toUpperCase();
-        label.style.fontWeight = "bold";
-        group.appendChild(label);
+    const label = document.createElement("div");
+    label.textContent = stat.toUpperCase();
+    label.style.fontWeight = "bold";
+    group.appendChild(label);
 
-        const options = getOptions(stat);
-        options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.className = "stat-button";
-          btn.textContent = opt.label;
-          group.appendChild(btn);
-        });
+    const options = getOptions(stat);
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "stat-button";
+      btn.textContent = opt.label;
 
-        container.appendChild(group);
+      // Attach handler immediately and immutably
+      btn.addEventListener("click", function handler(ev) {
+        // Remove handler so it can never fire again, then lock visually
+        btn.removeEventListener("click", handler);
+        btn.classList.add("locked");
+        btn.disabled = true;
+
+        // Optional: record the stat immediately if you have a recordStat function
+        // recordStat(hole, stat, opt.value !== undefined ? opt.value : opt.label);
       });
 
-      // ✅ Dirty lock fix — proven to hold
-      setTimeout(() => {
-        const buttons = document.querySelectorAll(".stat-button");
-        for (let i = 0; i < buttons.length; i++) {
-          buttons[i].onclick = function () {
-            this.classList.add("locked");
-            this.disabled = true;
-          };
-        }
-      }, 0);
+      group.appendChild(btn);
+    });
 
-      document.getElementById("top-running-status").textContent =
-        `Hole ${hole} of ${totalHoles}`;
-    }
+    container.appendChild(group);
+  });
+
+  // Update running status
+  document.getElementById("top-running-status").textContent =
+    `Hole ${hole} of ${totalHoles}`;
+}
 
     function getOptions(stat) {
       if (stat === "score") return [
