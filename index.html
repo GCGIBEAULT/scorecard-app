@@ -45,90 +45,116 @@
     let roundDate = "";
 let courseLayout = {};
 
-function startRound() {
+   function startRound() {
   courseName = document.getElementById("courseName").value.trim();
   roundDate = document.getElementById("roundDate").value;
-
   const dateInput = document.getElementById("roundDate");
-  if (dateInput && dateInput.value) {
-    dateInput.blur();
-    dateInput.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-
+if (dateInput && dateInput.value) {
+  dateInput.blur();
+  dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+}
+   
   playerHandicap = parseInt(document.getElementById("handicap").value, 10);
-  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked"))
-    .map(cb => cb.value);
+  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-  // ✅ Load saved layout if available
-  const savedLayout = localStorage.getItem(`layout_${courseName}`);
-  courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
+  // Wipe ghost layout and reset
+const savedLayout = localStorage.getItem(`layout_${courseName}`);
+courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
 
-  // ✅ Reset round state
+
+  // Initialize round
   currentHole = 1;
-  roundData[currentHole] = {};
   document.getElementById("stat-selector").style.display = "none";
-
-  // ✅ Clear and render Hole 1
-  document.getElementById("hole-view").innerHTML = "";
   renderHole(currentHole);
 }
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
-  container.innerHTML = ""; // 🧼 Clear previous hole block
 
   const holeBlock = document.createElement("div");
   holeBlock.className = "hole-block";
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
+// Only inject grid if layout is incomplete
+if (Object.keys(courseLayout).length < 18) {
+  const grid = document.createElement("div");
+  grid.id = "par-entry-grid";
 
-  // 🧱 Inject par-entry grid if layout is incomplete
-  if (Object.keys(courseLayout).length < 18) {
-const grid = document.createElement("div");
-grid.id = "par-entry-grid";
-grid.style.display = "grid";
-grid.style.gridTemplateColumns = "repeat(9, 1fr)";
-grid.style.gap = "6px";
-grid.style.rowGap = "12px";
-grid.style.padding = "8px 0";
-grid.style.maxWidth = "100%";
+  const row1 = document.createElement("div");
+  row1.className = "par-row";
+  row1.id = "par-row-1";
 
-for (let i = 1; i <= 18; i++) {
-  const input = document.createElement("input");
-  input.type = "number";
-  input.min = 3;
-  input.max = 5;
-  input.placeholder = `Hole ${i}`;
-  input.className = "par-input";
-  input.value = courseLayout[i] || "";
+  const row2 = document.createElement("div");
+  row2.className = "par-row";
+  row2.id = "par-row-2";
 
-  input.style.width = "100%";
-  input.style.boxSizing = "border-box";
+  grid.appendChild(row1);
+  grid.appendChild(row2);
+  holeBlock.appendChild(grid);
 
-  input.onchange = () => {
-    const val = parseInt(input.value, 10);
-    if (val >= 3 && val <= 5) {
-      courseLayout[i] = val;
-      if (i === hole) {
-        const parLabel = document.querySelector(".hole-label");
-        if (parLabel) parLabel.textContent = `Par ${val}`;
+  for (let i = 1; i <= 18; i++) {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = 3;
+    input.max = 5;
+    input.placeholder = `Hole ${i}`;
+    input.className = "par-input";
+    input.value = courseLayout[i] || "";
+    input.onchange = () => {
+      const val = parseInt(input.value, 10);
+      if (val >= 3 && val <= 5) {
+        courseLayout[i] = val;
+        if (i === hole) {
+          const parLabel = document.querySelector(".hole-label");
+          if (parLabel) parLabel.textContent = `Par ${val}`;
+        }
+        if (Object.keys(courseLayout).length === 18) {
+          grid.remove(); // 🧼 Clean up once all 18 are entered
+        }
       }
-      if (Object.keys(courseLayout).length === 18) {
-        grid.remove();
-        document.getElementById("hole-view").innerHTML = "";
-        renderHole(1);
-      }
-    }
-  };
-
-  grid.appendChild(input);
+    };
+    (i <= 9 ? row1 : row2).appendChild(input);
+  }
 }
 
-holeBlock.appendChild(grid);
+if (hole === 1 || courseLayout[hole]) {
+  const parDisplay = document.createElement("h2");
+  parDisplay.className = "hole-label"; // matches Hole X styling
+  parDisplay.style.marginTop = "0.5em"; // adds spacing
+  parDisplay.textContent = `Par ${courseLayout[hole] || "?"}`;
+  holeBlock.appendChild(parDisplay);
+}
 
+
+  selectedStats.forEach(stat => {
+    const statBlock = document.createElement("div");
+    statBlock.className = "stat-block";
+    statBlock.innerHTML = `<strong>${stat}</strong><br>`;
+
+    const options = getOptions(stat);
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.textContent = opt.label;
+btn.onclick = () => {
+  if (!roundData[hole]) roundData[hole] = {};
+  roundData[hole][stat] = opt.value;
+
+  // Clear previous selection for this stat
+  Array.from(statBlock.querySelectorAll("button")).forEach(b => b.classList.remove("selected"));
+
+  // Highlight the selected button
+  btn.classList.add("selected");
+
+  advanceStatOrHole(stat);
+};
+
+      statBlock.appendChild(btn);
+    });
+
+    holeBlock.appendChild(statBlock);
+  });
 
   container.appendChild(holeBlock);
 }
-
 function advanceStatOrHole(lastStat) {
   const stats = selectedStats;
   const data = roundData[currentHole] || {};
