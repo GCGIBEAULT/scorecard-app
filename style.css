@@ -149,3 +149,8 @@ button.selected {
   font-size: 0.9em;
   cursor: pointer;
 }
+.running-score {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  color: #333;
+}
