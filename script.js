@@ -77,24 +77,26 @@
     return true;
   }
 
-  // Attach Start Round listener to initialize selectedStats flow if needed
-  function attachStartListener() {
-    const btn = safeQueryAll('button').find(b => (b.textContent || '').trim() === 'Start Round') || safeQuery('button');
-    if (!btn) {
-      console.warn('Start Round button not found');
-      return;
-    }
-    if (btn.__syrrStartHandler) btn.removeEventListener('click', btn.__syrrStartHandler);
-    const handler = () => {
-      // reset state and attach stat handlers when round starts
-      clickCount = 0;
-      currentHole = 1;
-      attachStatHandlers();
-      console.log('Start Round clicked (runtime) — handlers attached');
-    };
-    btn.addEventListener('click', handler);
-    btn.__syrrStartHandler = handler;
+// Attach Start Round listener to initialize selectedStats flow if needed
+function attachStartListener() {
+  // prefer stable id
+  const btn = document.getElementById('start-round') || safeQueryAll('button').find(b => (b.textContent || '').trim() === 'Start Round') || safeQuery('button');
+  if (!btn) {
+    console.warn('Start Round button not found');
+    return;
   }
+  if (btn.__syrrStartHandler) btn.removeEventListener('click', btn.__syrrStartHandler);
+  const handler = () => {
+    // reset state and attach stat handlers when round starts
+    clickCount = 0;
+    currentHole = 1;
+    attachStatHandlers();
+    console.log('Start Round clicked (runtime) — handlers attached');
+  };
+  btn.addEventListener('click', handler);
+  btn.__syrrStartHandler = handler;
+}
+
 
   // Try to attach on DOM ready
   function init() {
