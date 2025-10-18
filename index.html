@@ -75,50 +75,62 @@ function renderHole(hole) {
   holeBlock.innerHTML = `<h2>Hole ${hole}</h2>`;
 
   // Only inject grid if layout is incomplete
-  if (Object.keys(courseLayout).length < 18) {
-    const grid = document.createElement("div");
-    grid.id = "par-entry-grid";
-    grid.style.display = "grid";
-    grid.style.gridTemplateColumns = "repeat(9, 1fr)";
-    grid.style.gap = "6px";
-    grid.style.padding = "8px 0";
-    grid.style.width = "100%";
+if (Object.keys(courseLayout).length < 18) {
+  const grid = document.createElement("div");
+  grid.id = "par-entry-grid";
+  grid.style.display = "grid";
+  grid.style.gridTemplateColumns = "repeat(9, 1fr)";
+  grid.style.gap = "6px";
+  grid.style.padding = "8px 0";
+  grid.style.width = "100%";
 
-    for (let i = 1; i <= 18; i++) {
-      const input = document.createElement("input");
-      input.type = "number";
-      input.min = 3;
-      input.max = 5;
-      input.placeholder = `Hole ${i}`;
-      input.className = "par-input";
-      input.value = courseLayout[i] || "";
+  for (let i = 1; i <= 18; i++) {
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.flexDirection = "column";
+    wrapper.style.alignItems = "center";
 
-      input.style.width = "100%";
-      input.style.boxSizing = "border-box";
-      input.style.padding = "6px";
-      input.style.fontSize = "0.9rem";
+    const label = document.createElement("label");
+    label.textContent = `Hole ${i}`;
+    label.style.fontSize = "0.8rem";
+    label.style.marginBottom = "4px";
 
-      input.onchange = () => {
-        const val = parseInt(input.value, 10);
-        if (val >= 3 && val <= 5) {
-          courseLayout[i] = val;
-          if (i === hole) {
-            const parLabel = document.querySelector(".hole-label");
-            if (parLabel) parLabel.textContent = `Par ${val}`;
-          }
-          if (Object.keys(courseLayout).length === 18) {
-            grid.remove();
-            container.innerHTML = "";
-            renderHole(1);
-          }
+    const input = document.createElement("input");
+    input.type = "number";
+    input.min = 3;
+    input.max = 5;
+    input.className = "par-input";
+    input.value = courseLayout[i] || "";
+
+    input.style.width = "100%";
+    input.style.boxSizing = "border-box";
+    input.style.padding = "6px";
+    input.style.fontSize = "0.9rem";
+
+    input.onchange = () => {
+      const val = parseInt(input.value, 10);
+      if (val >= 3 && val <= 5) {
+        courseLayout[i] = val;
+        if (i === hole) {
+          const parLabel = document.querySelector(".hole-label");
+          if (parLabel) parLabel.textContent = `Par ${val}`;
         }
-      };
+        if (Object.keys(courseLayout).length === 18) {
+          grid.remove();
+          document.getElementById("hole-view").innerHTML = "";
+          renderHole(1);
+        }
+      }
+    };
 
-      grid.appendChild(input);
-    }
-
-    holeBlock.appendChild(grid);
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+    grid.appendChild(wrapper);
   }
+
+  holeBlock.appendChild(grid);
+}
+
 
   // Display par if known
   if (hole === 1 || courseLayout[hole]) {
