@@ -374,6 +374,21 @@ if (scope === "front9") {
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
 }
+window.addEventListener("DOMContentLoaded", () => {
+  const startBtn = document.getElementById("startRound");
+  if (startBtn) {
+    startBtn.onclick = () => {
+      console.log("Start Round clicked");
+      if (typeof startRound === "function") {
+        startRound();
+      } else {
+        console.error("startRound is not defined.");
+      }
+    };
+  } else {
+    console.error("Start Round button not found.");
+  }
+});
 
 <script src="script.js"></script>
 </body>
