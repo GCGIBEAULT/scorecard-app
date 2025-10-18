@@ -1,130 +1,43 @@
+/* Global layout */
 body {
-  font-family: sans-serif;
+  font-family: Arial, sans-serif;
+  margin: 0;
   padding: 1em;
-  max-width: 600px;
-  margin: auto;
+  background-color: #f5f5f5;
 }
 
+/* Unified button styling */
 button {
-  margin: 5px;
-  padding: 10px 15px;
-  font-size: 16px;
-}
-
-.stat-block {
-  margin-bottom: 1em;
-}
-
-#hole-view {
-  max-height: 90vh;
-  overflow-y: auto;
-  padding-bottom: 2em;
-}
-
-#hole-view table {
-  width: 100%;
-  font-size: 14px;
-  margin-top: 1em;
-}
-
-#hole-view h2 {
-  margin-top: 0;
-}
-button {
-  transition: background-color 0.2s ease, transform 0.1s ease;
-  border: 1px solid #444;
-  background-color: #f0f0f0;
-  padding: 6px 12px;
-  font-weight: bold;
+  padding: 0.5em 1em;
+  font-size: 1em;
   cursor: pointer;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0.3em 0.2em;
 }
 
 button:hover {
-  background-color: #d0eaff; /* subtle blue tint */
+  background-color: #ddd;
 }
 
 button:active {
-  background-color: #a8d0ff; /* deeper blue on click */
-  transform: scale(0.97);    /* slight press effect */
-}
-button.selected {
-  background-color: #007BFF;
-  color: white;
-  border: 2px solid #0056b3;
-}
-#top-running-status {
-  margin: 8px 0 12px 0;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 1.2;
+  background-color: #ccc;
 }
 
-/* ──────────────────────────────── */
-/* Running Status Color Indicators */
-/* ──────────────────────────────── */
-.running-status.over { color: #b00020; }
-.running-status.under { color: #1b5e20; }
-.running-status.even { color: #333; }
-
-/* ──────────────────────────────── */
-/* Summary Block: Next Action CTA  */
-/* ──────────────────────────────── */
-.next-block {
-  margin-top: 24px;
-  padding: 12px 0;
-  text-align: center;
-  border-top: 1px solid #ccc;
+/* Hole block container */
+#hole-view {
+  margin-top: 2em;
 }
 
-.next-block button {
-  background-color: #007BFF;
-  color: white;
-  border: 2px solid #0056b3;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+/* Running score display */
+.running-score {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  color: #333;
 }
 
-.next-block button:hover {
-  background-color: #0056b3;
-  transform: scale(1.03);
-}
-.par-row {
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  gap: 6px;
-  margin-bottom: 12px;
-}
-.par-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 6px;
-  font-size: 1rem;
-}
-/* ──────────────────────────────── */
-/* Mobile Grid Override: 5+4 x 2   */
-/* ──────────────────────────────── */
-.par-row:nth-child(1),
-.par-row:nth-child(3) {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.par-row:nth-child(2),
-.par-row:nth-child(4) {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 12px;
-}
-.row-1,
-.row-3 {
-  grid-template-columns: repeat(5, 1fr);
-}
-.row-2,
-.row-4 {
-  grid-template-columns: repeat(4, 1fr);
-}
+/* Saved rounds block */
 #saved-rounds-block {
   margin-top: 2em;
   padding: 1em;
@@ -148,9 +61,4 @@ button.selected {
   padding: 0.4em 0.8em;
   font-size: 0.9em;
   cursor: pointer;
-}
-.running-score {
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  color: #333;
 }
