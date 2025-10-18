@@ -113,6 +113,16 @@ document.getElementById("show-summary").addEventListener("click", () => {
     }
   }
 
+<script>
+  const roundData = {};
+
+  function recordStat(hole, stat, value) {
+    if (!roundData[hole]) {
+      roundData[hole] = {};
+    }
+    roundData[hole][stat] = value;
+  }
+
   document.getElementById("show-summary").addEventListener("click", () => {
     const summaryBlock = document.getElementById("summary-block");
     summaryBlock.innerHTML = "";
@@ -144,6 +154,5 @@ document.getElementById("show-summary").addEventListener("click", () => {
   });
 </script>
 
-  <script src="script.js"></script>
 </body>
 </html>
