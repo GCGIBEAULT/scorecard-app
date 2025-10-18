@@ -11,17 +11,7 @@
 <div id="top-running-status" class="running-status even"></div>
 <div id="top-running-status" class="running-status even"></div>
 
-<!-- Par Entry Block: 9 across, 9 below -->
-<div id="par-entry-container">
-  <div class="par-row" id="front-nine">
-    <div class="par-block" data-hole="1"><input type="number" placeholder="Par 1"></div>
-    <!-- Repeat through 9 -->
-  </div>
-  <div class="par-row" id="back-nine">
-    <div class="par-block" data-hole="10"><input type="number" placeholder="Par 10"></div>
-    <!-- Repeat through 18 -->
-  </div>
-</div>
+
 
 <label for="courseName"><strong>Course Name:</strong></label>
 <input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
@@ -61,27 +51,52 @@
     let roundDate = "";
 let courseLayout = {};
 
-   function startRound() {
+function startRound() {
   courseName = document.getElementById("courseName").value.trim();
   roundDate = document.getElementById("roundDate").value;
-  const dateInput = document.getElementById("roundDate");
-if (dateInput && dateInput.value) {
-  dateInput.blur();
-  dateInput.dispatchEvent(new Event("change", { bubbles: true }));
-}
-   
   playerHandicap = parseInt(document.getElementById("handicap").value, 10);
   selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
 
-  // Wipe ghost layout and reset
-const savedLayout = localStorage.getItem(`layout_${courseName}`);
-courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
+  const container = document.getElementById("hole-view");
+  container.innerHTML = ""; // clear previous content
 
+  const parEntryContainer = document.createElement("div");
+  parEntryContainer.id = "par-entry-container";
 
-  // Initialize round
-  currentHole = 1;
-  document.getElementById("stat-selector").style.display = "none";
-  renderHole(currentHole);
+  const frontNine = document.createElement("div");
+  frontNine.className = "par-row";
+  for (let i = 1; i <= 9; i++) {
+    const block = document.createElement("div");
+    block.className = "par-block";
+    block.dataset.hole = i;
+    block.innerHTML = `<input type="number" placeholder="Par ${i}">`;
+    frontNine.appendChild(block);
+  }
+
+  const backNine = document.createElement("div");
+  backNine.className = "par-row";
+  for (let i = 10; i <= 18; i++) {
+    const block = document.createElement("div");
+    block.className = "par-block";
+    block.dataset.hole = i;
+    block.innerHTML = `<input type="number" placeholder="Par ${i}">`;
+    backNine.appendChild(block);
+  }
+
+  parEntryContainer.appendChild(frontNine);
+  parEntryContainer.appendChild(backNine);
+  container.appendChild(parEntryContainer);
+
+  // Listener to detect when all 18 are filled
+  parEntryContainer.querySelectorAll("input").forEach(input => {
+    input.addEventListener("change", () => {
+      const allFilled = Array.from(parEntryContainer.querySelectorAll("input")).every(i => i.value.trim() !== "");
+      if (allFilled) {
+        parEntryContainer.remove();
+        renderHole(1); // Begin round at Hole 1
+      }
+    });
+  });
 }
 
 function renderHole(hole) {
