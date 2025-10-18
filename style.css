@@ -125,3 +125,34 @@ button.selected {
 .row-4 {
   grid-template-columns: repeat(4, 1fr);
 }
+.stat-block {
+  margin-bottom: 1em;
+  padding: 1em;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+
+.stat-block h3 {
+  margin-top: 0;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.stat-block label {
+  display: block;
+  margin: 0.5em 0;
+  font-size: 0.95em;
+}
+
+.par-input {
+  width: 100%;
+  padding: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+input[type="number"],
+input[type="checkbox"] {
+  margin-left: 0.5em;
+}
