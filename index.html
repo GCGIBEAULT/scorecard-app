@@ -166,8 +166,39 @@ input.placeholder = `${i}`;
 function recordStat(hole, stat, value) {
   if (!roundData[hole]) roundData[hole] = {};
   roundData[hole][stat] = value;
-  advanceStatOrHole(stat);
+
+  const data = roundData[hole];
+  const entered = selectedStats.filter(s => data[s] !== undefined);
+
+  if (entered.length === selectedStats.length) {
+    if (!courseLayout[hole]) {
+      const parInput = document.getElementById(`par${hole}`);
+      const parValue = parseInt(parInput?.value);
+      if (parValue) {
+        courseLayout[hole] = parValue;
+        localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
+      }
+    }
+
+    localStorage.setItem("roundData", JSON.stringify(roundData));
+    const container = document.getElementById("hole-view");
+    container.innerHTML = "";
+    currentHole = hole + 1;
+
+    if (currentHole === 10) {
+      showSummary("front9");
+      return;
+    }
+
+    if (currentHole <= totalHoles) {
+      renderHole(currentHole);
+    } else {
+      showSummary("back9");
+      showSummary("full");
+    }
+  }
 }
+
 
 function advanceStatOrHole(lastStat) {
   const stats = selectedStats;
