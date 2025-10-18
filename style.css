@@ -117,3 +117,11 @@ button.selected {
   gap: 6px;
   margin-bottom: 12px;
 }
+.row-1,
+.row-3 {
+  grid-template-columns: repeat(5, 1fr);
+}
+.row-2,
+.row-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
