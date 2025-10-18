@@ -67,6 +67,38 @@ courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
   document.getElementById("stat-selector").style.display = "none";
   renderHole(currentHole);
 }
+function recordStat(hole, stat, value) {
+  if (!roundData[hole]) roundData[hole] = {};
+  if (roundData[hole][stat] !== undefined) return;
+
+  roundData[hole][stat] = value;
+
+  // Lock the button visually
+  const buttons = document.querySelectorAll(`.stat-button[data-stat="${stat}"]`);
+  buttons.forEach(btn => {
+    if (btn.dataset.value === String(value)) {
+      btn.classList.add("locked");
+      btn.disabled = true;
+    }
+  });
+
+  // Update status
+  const statusEl = document.getElementById("top-running-status");
+  if (statusEl) statusEl.textContent = `Hole ${hole} — recorded ${stat}: ${value}`;
+
+  // Check if all stats are recorded
+  const entered = selectedStats.filter(s => roundData[hole][s] !== undefined);
+  if (entered.length === selectedStats.length) {
+    setTimeout(() => {
+      currentHole++;
+      if (currentHole <= totalHoles) {
+        renderHole(currentHole);
+      } else {
+        showSummary("full");
+      }
+    }, 300);
+  }
+}
 
 function renderHole(hole) {
   const container = document.getElementById("hole-view");
