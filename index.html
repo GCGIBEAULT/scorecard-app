@@ -177,40 +177,7 @@ btn.onclick = () => {
 
   container.appendChild(holeBlock);
 }
-function advanceStatOrHole(lastStat) {
-  const stats = selectedStats;
-  const data = roundData[currentHole] || {};
-  const entered = stats.filter(stat => data[stat] !== undefined);
 
-  if (entered.length === stats.length) {
-    if (!courseLayout[currentHole]) {
-      const parInput = document.getElementById(`par${currentHole}`);
-      const parValue = parseInt(parInput?.value);
-      if (parValue) {
-        courseLayout[currentHole] = parValue;
-        localStorage.setItem(`layout_${courseName}`, JSON.stringify(courseLayout));
-      }
-    }
-
-    localStorage.setItem("roundData", JSON.stringify(roundData));
-    const container = document.getElementById("hole-view");
-    container.innerHTML = "";
-
-currentHole++;
-
-if (currentHole === 10) {
-  showSummary("front9");
-  return; // ⛔ Prevents Hole 10 from rendering immediately
-}
-
-if (currentHole <= totalHoles) {
-  renderHole(currentHole);
-    } else {
-      showSummary("back9");
-      showSummary("full");
-    }
-  } // ✅ Closes: if (entered.length === stats.length)
-}   // ✅ Closes: function advanceStatOrHole
 function saveRoundToLocal(roundData, courseLayout) {
   const course = document.getElementById("course-name")?.value || "Unnamed Course";
   const date = document.getElementById("round-date")?.value || new Date().toLocaleDateString();
