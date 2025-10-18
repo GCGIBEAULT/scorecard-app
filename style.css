@@ -62,3 +62,35 @@ button:active {
   font-size: 0.9em;
   cursor: pointer;
 }
+#start-round-form {
+  margin-top: 1em;
+  padding: 1em;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#start-round-form h2 {
+  margin-top: 0;
+  font-size: 1.4em;
+}
+
+#start-round-form label {
+  display: block;
+  margin-top: 0.5em;
+  font-weight: bold;
+}
+
+#start-round-form input,
+#start-round-form select {
+  width: 100%;
+  padding: 0.4em;
+  margin-top: 0.2em;
+  margin-bottom: 0.8em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#start-round-form button {
+  margin-top: 1em;
+}
