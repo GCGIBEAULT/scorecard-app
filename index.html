@@ -354,6 +354,24 @@ if (scope === "front9") {
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
 }
+function saveRoundToLocal(roundData, courseLayout) {
+  const courseName = document.getElementById("courseName")?.value || "Unnamed Course";
+  const roundDate = document.getElementById("roundDate")?.value || new Date().toISOString().split("T")[0];
+  const handicap = document.getElementById("handicap")?.value || "N/A";
+
+  const savedRounds = JSON.parse(localStorage.getItem("savedRounds") || "[]");
+
+  savedRounds.push({
+    courseName,
+    roundDate,
+    handicap,
+    roundData,
+    courseLayout
+  });
+
+  localStorage.setItem("savedRounds", JSON.stringify(savedRounds));
+  alert("Round saved successfully.");
+}
 
 
   </script>
