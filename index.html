@@ -92,13 +92,12 @@ if (Object.keys(courseLayout).length < 18) {
 
 
 
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = 3;
-    input.max = 5;
-    input.className = "par-input";
-input.value = courseLayout[i] !== undefined ? courseLayout[i] : `${i}`;
-
+const input = document.createElement("input");
+input.type = "number";
+input.min = 3;
+input.max = 5;
+input.className = "par-input";
+input.value = courseLayout[i] !== undefined ? courseLayout[i] : "";
 input.placeholder = `${i}`;
 
 
