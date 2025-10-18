@@ -166,6 +166,34 @@ function renderHole(hole) {
   const startBtn = document.querySelector("#stat-selector button");
   if (startBtn) startBtn.type = "button";
 }
+// Call this after you render the par grid (once per render)
+function attachPar18Listener() {
+  const par18 = document.getElementById('par-18');
+  if (!par18) return;
+
+  const hideParGrid = () => {
+    const val = par18.value && par18.value.trim();
+    if (!val) return;
+    // persist value
+    roundData.pars = roundData.pars || {};
+    roundData.pars[18] = val;
+    // remove/hide the par grid container
+    const grid = document.querySelector('.par-grid') || document.querySelector('.par-row');
+    if (grid) grid.remove();
+    // update status so user knows change applied
+    const statusEl = document.getElementById('top-running-status');
+    if (statusEl) statusEl.textContent = `Par for 18 saved; par grid hidden.`;
+  };
+
+  // handle both blur and Enter key (Enter commits)
+  par18.addEventListener('blur', hideParGrid);
+  par18.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      par18.blur(); // triggers blur handler
+    }
+  });
+}
 
 
 function advanceStatOrHole(lastStat) {
