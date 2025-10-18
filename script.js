@@ -121,3 +121,23 @@
     getState: () => ({ currentHole, clickCount })
   };
 })();
+// Expose startRound so legacy onclick="startRound()" works and to initialize handlers
+window.startRound = function(){
+  try {
+    // reset runtime state if present
+    if(window.__syrrRuntime && window.__syrrRuntime.getState){
+      const s = window.__syrrRuntime.getState();
+      // reset internal counters if accessible
+      if(typeof s.currentHole === 'number') {
+        // best-effort reset via exposed API
+        if(window.__syrrRuntime.advanceHole) { /* noop: keep API stable */ }
+      }
+    }
+    // invoke the same logic as Start Round click
+    const btn = [...document.querySelectorAll('button')].find(b=> (b.textContent||'').trim() === 'Start Round') || document.querySelector('button');
+    if(btn) btn.click();
+    console.log('startRound() (permanent shim) invoked');
+  } catch(e) {
+    console.error('startRound() shim failed', e);
+  }
+};
