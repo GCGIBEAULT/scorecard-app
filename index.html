@@ -45,26 +45,31 @@
     let roundDate = "";
 let courseLayout = {};
 
-   function startRound() {
+function startRound() {
   courseName = document.getElementById("courseName").value.trim();
   roundDate = document.getElementById("roundDate").value;
+
   const dateInput = document.getElementById("roundDate");
-if (dateInput && dateInput.value) {
-  dateInput.blur();
-  dateInput.dispatchEvent(new Event("change", { bubbles: true }));
-}
-   
+  if (dateInput && dateInput.value) {
+    dateInput.blur();
+    dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
   playerHandicap = parseInt(document.getElementById("handicap").value, 10);
-  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked")).map(cb => cb.value);
+  selectedStats = Array.from(document.querySelectorAll("#stat-selector input:checked"))
+    .map(cb => cb.value);
 
-  // Wipe ghost layout and reset
-const savedLayout = localStorage.getItem(`layout_${courseName}`);
-courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
+  // ✅ Load saved layout if available
+  const savedLayout = localStorage.getItem(`layout_${courseName}`);
+  courseLayout = savedLayout ? JSON.parse(savedLayout) : {};
 
-
-  // Initialize round
+  // ✅ Reset round state
   currentHole = 1;
+  roundData[currentHole] = {};
   document.getElementById("stat-selector").style.display = "none";
+
+  // ✅ Clear and render Hole 1
+  document.getElementById("hole-view").innerHTML = "";
   renderHole(currentHole);
 }
 
