@@ -60,6 +60,10 @@ function renderHole(hole) {
   const container = document.getElementById("hole-view");
   container.innerHTML = "";
 
+  // ensure Start Round (or other controls) are not treated as submit buttons
+  const startBtn = document.querySelector("#stat-selector button");
+  if (startBtn) startBtn.type = "button";
+
   selectedStats.forEach(stat => {
     const group = document.createElement("div");
     group.className = "button-group";
@@ -72,30 +76,67 @@ function renderHole(hole) {
     const options = getOptions(stat);
     options.forEach(opt => {
       const btn = document.createElement("button");
-      btn.type = "button";
+      btn.type = "button"; // critical: prevent implicit form submit/navigation
       btn.className = "stat-button";
       btn.textContent = opt.label;
+      btn.dataset.stat = stat;
+      // keep a clean value to record; prefer numeric/value if present
+      btn.dataset.value = (opt.value !== undefined) ? String(opt.value) : String(opt.label);
 
-      // Attach handler immediately and immutably
-      btn.addEventListener("click", function handler(ev) {
-        // Remove handler so it can never fire again, then lock visually
-        btn.removeEventListener("click", handler);
+      // attach immutable handler at creation
+      const handler = function (ev) {
+        // stop anything else from reacting to this click
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
+        // if already locked, do nothing
+        if (btn.classList.contains("locked")) return false;
+
+        // visually lock and disable
         btn.classList.add("locked");
         btn.disabled = true;
 
-        // Optional: record the stat immediately if you have a recordStat function
-        // recordStat(hole, stat, opt.value !== undefined ? opt.value : opt.label);
-      });
+        // record stat into roundData immediately (adjust shape if needed)
+        if (!roundData[hole]) roundData[hole] = {};
+        roundData[hole][stat] = btn.dataset.value;
 
+        // optional: update running status or summary in place
+        document.getElementById("top-running-status").textContent =
+          `Hole ${currentHole} of ${totalHoles} — recorded ${stat}: ${btn.dataset.value}`;
+
+        // ensure this click never triggers any global "advance" logic
+        // do NOT call advanceHole() or similar here; advance should be explicit elsewhere
+        btn.removeEventListener("click", handler);
+        return false;
+      };
+
+      btn.addEventListener("click", handler);
       group.appendChild(btn);
     });
 
     container.appendChild(group);
   });
 
-  // Update running status
-  document.getElementById("top-running-status").textContent =
-    `Hole ${hole} of ${totalHoles}`;
+  // update visible top status without changing structure
+  const statusEl = document.getElementById("top-running-status");
+  if (statusEl) statusEl.textContent = `Hole ${hole} of ${totalHoles}`;
+
+  // ensure no rogue form submit or global click handler will advance hole accidentally
+  // add a short-circuit global click stopper only while hole UI is active
+  // this prevents other delegated listeners from interpreting stat clicks as "advance"
+  const globalGuard = function (ev) {
+    // if click originated inside our hole-view, stop propagation to external handlers
+    if (document.getElementById("hole-view") && document.getElementById("hole-view").contains(ev.target)) {
+      ev.stopImmediatePropagation();
+      // don't preventDefault globally so other non-conflicting behavior remains
+    }
+  };
+  // attach once; remove after a short delay so it doesn't persist unnecessarily
+  window.addEventListener("click", globalGuard, true);
+  setTimeout(() => window.removeEventListener("click", globalGuard, true), 500);
+
+  // ensure capitalization/labels match design: if you want lowercase labels, map them here
+  // (left capitalized to match repo styling; change if you prefer)
 }
 
     function getOptions(stat) {
