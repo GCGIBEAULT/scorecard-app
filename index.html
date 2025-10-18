@@ -374,6 +374,31 @@ if (scope === "front9") {
 
   document.getElementById("summary-block").innerHTML = summaryHTML;
 }
+<script>
+  function renderAllHoles() {
+    const container = document.getElementById("hole-view");
+    container.innerHTML = ""; // Clear any existing content
+
+    for (let i = 1; i <= 18; i++) {
+      const block = document.createElement("div");
+      block.className = "stat-block";
+
+      block.innerHTML = `
+        <h3>Hole ${i}</h3>
+        <label>Par: <input type="number" class="par-input" name="par-${i}" min="3" max="5"></label>
+        <label>Score: <input type="number" name="score-${i}" min="1" max="10"></label>
+        <label>Putts: <input type="number" name="putts-${i}" min="0" max="4"></label>
+        <label>GIR: <input type="checkbox" name="gir-${i}"></label>
+        <label>Fairway Hit: <input type="checkbox" name="fairway-${i}"></label>
+      `;
+
+      container.appendChild(block);
+    }
+  }
+
+  // Call it on page load
+  window.onload = renderAllHoles;
+</script>
 
 
   </script>
