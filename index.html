@@ -171,29 +171,47 @@ function attachPar18Listener() {
   const par18 = document.getElementById('par-18');
   if (!par18) return;
 
-  const hideParGrid = () => {
-    const val = par18.value && par18.value.trim();
-    if (!val) return;
-    // persist value
+  const commitAndHide = () => {
+    const raw = (par18.value || '').toString().trim();
+    if (!raw) return;
+    const num = Number(raw);
+    if (!Number.isInteger(num) || num < 3 || num > 6) {
+      // invalid par; keep focus so user corrects it
+      par18.classList.add('invalid-par');
+      return;
+    }
+    par18.classList.remove('invalid-par');
+
+    // persist
     roundData.pars = roundData.pars || {};
-    roundData.pars[18] = val;
-    // remove/hide the par grid container
+    roundData.pars[18] = num;
+
+    // hide the entire par grid container (keeps DOM but removes from layout)
     const grid = document.querySelector('.par-grid') || document.querySelector('.par-row');
-    if (grid) grid.remove();
-    // update status so user knows change applied
+    if (grid) grid.style.display = 'none';
+
+    // update status so user sees the commit
     const statusEl = document.getElementById('top-running-status');
-    if (statusEl) statusEl.textContent = `Par for 18 saved; par grid hidden.`;
+    if (statusEl) statusEl.textContent = `Par for 18 saved: ${num}. Par grid hidden.`;
   };
 
-  // handle both blur and Enter key (Enter commits)
-  par18.addEventListener('blur', hideParGrid);
-  par18.addEventListener('keydown', function (e) {
+  // remove existing listeners first to avoid duplicates on repeated renders
+  par18.removeEventListener('blur', par18._par18BlurHandler || (() => {}));
+  par18.removeEventListener('keydown', par18._par18KeyHandler || (() => {}));
+
+  par18._par18BlurHandler = commitAndHide;
+  par18._par18KeyHandler = function (e) {
     if (e.key === 'Enter') {
       e.preventDefault();
-      par18.blur(); // triggers blur handler
+      commitAndHide();
+      par18.blur();
     }
-  });
+  };
+
+  par18.addEventListener('blur', par18._par18BlurHandler);
+  par18.addEventListener('keydown', par18._par18KeyHandler);
 }
+
 
 
 function advanceStatOrHole(lastStat) {
