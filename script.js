@@ -1,145 +1,113 @@
-// Consolidated runtime for Start Your Round
-// Replace entire script.js with this exact content
+// script.js — Replace entire file with this exact content
+(function(){
+  const TOTAL_HOLES = 18;
 
-(function () {
-  // Config
-  const totalHoles = 18;
-
-  // State
+  // runtime state
   let currentHole = 1;
   let clickCount = 0;
 
-  // Utilities
-  function safeQuery(selector) {
-    try { return document.querySelector(selector); } catch (e) { return null; }
+  // utilities
+  function qAll(sel){ try{ return Array.from(document.querySelectorAll(sel)); }catch(e){ return []; } }
+  function q(sel){ try{ return document.querySelector(sel); }catch(e){ return null; } }
+  function isStatButton(b){
+    if(!b || !b.textContent) return false;
+    const t = b.textContent.trim();
+    return /^\d+$/.test(t) || t === 'Hit' || t === 'X';
   }
-  function safeQueryAll(selector) {
-    try { return Array.from(document.querySelectorAll(selector)); } catch (e) { return []; }
-  }
-
-  function scrollToHole(n) {
-    const el = document.getElementById('hole' + n) || safeQuery('#hole-view h2');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  // Visual selected style
-  (function ensureStyle() {
-    const id = 'syrr-runtime-style';
-    if (document.getElementById(id)) return;
+  function ensureStyle(){
+    if(document.getElementById('__syrr_style')) return;
     const s = document.createElement('style');
-    s.id = id;
+    s.id = '__syrr_style';
     s.textContent = '.selected-runtime{ outline:3px solid #0b84ff; background:#eaf4ff; }';
     document.head.appendChild(s);
-  })();
+  }
 
-  // Mark selected within same label (by text) for current runtime
-  function markSelected(btn) {
+  // visual selection
+  function markSelected(btn){
     const txt = (btn.textContent || '').trim();
-    const sameText = safeQueryAll('button').filter(b => (b.textContent || '').trim() === txt);
-    sameText.forEach(s => s.classList.remove('selected-runtime'));
+    qAll('button').filter(b => (b.textContent || '').trim() === txt).forEach(x => x.classList.remove('selected-runtime'));
     btn.classList.add('selected-runtime');
   }
 
-  // Stat click handler
-  function onStatClick(e) {
+  // advance logic
+  function scrollToHole(n){
+    const el = document.getElementById('hole' + n) || q('#hole-view h2') || q('#hole-view');
+    if(el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function onStatClick(e){
     const btn = e.currentTarget;
     markSelected(btn);
     clickCount++;
     console.log('stat clicked', clickCount);
-    if (clickCount >= 4) {
+    if(clickCount >= 4){
       clickCount = 0;
-      currentHole = Math.min(totalHoles, currentHole + 1);
+      currentHole = Math.min(TOTAL_HOLES, currentHole + 1);
       console.log('ADVANCE HOLE ->', currentHole);
       scrollToHole(currentHole);
-      // Optional: fire an event other code can listen to
       document.dispatchEvent(new CustomEvent('syrr:holeAdvanced', { detail: { hole: currentHole } }));
     }
   }
 
-  // Attach runtime handlers to stat buttons
-  function attachStatHandlers() {
-    const statButtons = safeQueryAll('button').filter(b => {
-      const t = (b.textContent || '').trim();
-      return /^\d+$/.test(t) || t === 'Hit' || t === 'X';
-    });
-    if (!statButtons.length) {
-      console.warn('No stat buttons found to attach handlers');
+  function attachStatHandlers(){
+    ensureStyle();
+    const stats = qAll('button').filter(isStatButton);
+    if(!stats.length){
+      console.warn('SYRR: no stat buttons found to attach');
       return false;
     }
-    statButtons.forEach(b => {
-      // remove previously attached handler if present
-      if (b.__syrrRuntimeHandler) b.removeEventListener('click', b.__syrrRuntimeHandler);
-      const h = onStatClick.bind(b);
-      b.addEventListener('click', h);
-      b.__syrrRuntimeHandler = h;
+    stats.forEach(b => {
+      if(b.__syrrHandler) b.removeEventListener('click', b.__syrrHandler);
+      b.__syrrHandler = onStatClick;
+      b.addEventListener('click', onStatClick);
     });
-    console.log('Runtime handlers attached to', statButtons.length, 'stat buttons');
+    console.log('SYRR: attached stat handlers to', stats.length, 'buttons');
     return true;
   }
 
-// Attach Start Round listener to initialize selectedStats flow if needed
-function attachStartListener() {
-  // prefer stable id
-  const btn = document.getElementById('start-round') || safeQueryAll('button').find(b => (b.textContent || '').trim() === 'Start Round') || safeQuery('button');
-  if (!btn) {
-    console.warn('Start Round button not found');
-    return;
-  }
-  if (btn.__syrrStartHandler) btn.removeEventListener('click', btn.__syrrStartHandler);
-  const handler = () => {
-    // reset state and attach stat handlers when round starts
-    clickCount = 0;
-    currentHole = 1;
-    attachStatHandlers();
-    console.log('Start Round clicked (runtime) — handlers attached');
-  };
-  btn.addEventListener('click', handler);
-  btn.__syrrStartHandler = handler;
-}
-
-
-  // Try to attach on DOM ready
-  function init() {
-    attachStartListener();
-    const attached = attachStatHandlers();
-    if (!attached) {
-      // fallback: try again after short delay in case buttons render later
-      setTimeout(() => {
-        attachStartListener();
-        attachStatHandlers();
-      }, 450);
+  function attachStartListener(){
+    const btn = document.getElementById('start-round') || qAll('button').find(b => (b.textContent || '').trim() === 'Start Round');
+    if(!btn){
+      console.warn('SYRR: Start Round button not found');
+      return;
     }
+    if(btn.__syrrStartHandler) btn.removeEventListener('click', btn.__syrrStartHandler);
+    btn.__syrrStartHandler = function(){
+      clickCount = 0;
+      currentHole = 1;
+      attachStatHandlers();
+      console.log('SYRR: Start Round clicked — handlers attached');
+    };
+    btn.addEventListener('click', btn.__syrrStartHandler);
   }
 
-  if (document.readyState === 'loading') {
+  // safe global for any inline calls or external callers
+  window.startRound = window.startRound || function(){
+    const btn = document.getElementById('start-round') || qAll('button').find(b => (b.textContent || '').trim() === 'Start Round');
+    if(btn && typeof btn.click === 'function') {
+      btn.click();
+      console.log('SYRR: startRound() shim invoked');
+      return true;
+    }
+    console.warn('SYRR: startRound() shim could not find Start Round button');
+    return false;
+  };
+
+  // init
+  function init(){
+    attachStartListener();
+    attachStatHandlers();
+  }
+
+  if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 
-  // Expose for debugging
+  // debug API
   window.__syrrRuntime = {
-    advanceHole: () => { clickCount = 4; onStatClick({ currentTarget: document.querySelector('button') }); },
-    getState: () => ({ currentHole, clickCount })
+    getState: () => ({ currentHole, clickCount }),
+    reset: () => { clickCount = 0; currentHole = 1; }
   };
 })();
-// Expose startRound so legacy onclick="startRound()" works and to initialize handlers
-window.startRound = function(){
-  try {
-    // reset runtime state if present
-    if(window.__syrrRuntime && window.__syrrRuntime.getState){
-      const s = window.__syrrRuntime.getState();
-      // reset internal counters if accessible
-      if(typeof s.currentHole === 'number') {
-        // best-effort reset via exposed API
-        if(window.__syrrRuntime.advanceHole) { /* noop: keep API stable */ }
-      }
-    }
-    // invoke the same logic as Start Round click
-    const btn = [...document.querySelectorAll('button')].find(b=> (b.textContent||'').trim() === 'Start Round') || document.querySelector('button');
-    if(btn) btn.click();
-    console.log('startRound() (permanent shim) invoked');
-  } catch(e) {
-    console.error('startRound() shim failed', e);
-  }
-};
