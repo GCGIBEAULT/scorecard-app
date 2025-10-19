@@ -4,31 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Scorecard App</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-    label, input, button {
-      display: block;
-      margin: 10px 0;
-    }
-    fieldset {
-      margin: 20px 0;
-    }
-    #top-running-status {
-      margin-top: 20px;
-      font-weight: bold;
-      color: green;
-    }
-    #hole-view {
-      margin-top: 20px;
-      padding: 10px;
-      background: #f0f0f0;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Start Your Round</h1>
@@ -55,37 +31,6 @@
   <div id="top-running-status"></div>
   <div id="hole-view"></div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const startButton = document.getElementById("start-round");
-      const statusBlock = document.getElementById("top-running-status");
-      const holeView = document.getElementById("hole-view");
-
-      if (!startButton || !statusBlock || !holeView) {
-        alert("Critical elements missing. Cannot start round.");
-        return;
-      }
-
-      startButton.addEventListener("click", function () {
-        const courseName = document.getElementById("courseName")?.value || "Unnamed Course";
-        const roundDate = document.getElementById("roundDate")?.value || "Unknown Date";
-        const handicap = document.getElementById("handicap")?.value || "N/A";
-
-        const selectedStats = Array.from(
-          document.querySelectorAll("#stat-selector input[type='checkbox']:checked")
-        ).map((checkbox) => checkbox.value);
-
-        const roundData = {
-          courseName,
-          roundDate,
-          handicap,
-          selectedStats,
-        };
-
-        statusBlock.textContent = `✅ Round started at ${courseName} on ${roundDate}`;
-        holeView.innerHTML = `<p>Tracking started. First hole ready.</p>`;
-      });
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
