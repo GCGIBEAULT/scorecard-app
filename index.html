@@ -4,39 +4,88 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Scorecard App</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    label, input, button {
+      display: block;
+      margin: 10px 0;
+    }
+    fieldset {
+      margin: 20px 0;
+    }
+    #top-running-status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+    #hole-view {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
   <h1>Start Your Round</h1>
 
-  <div id="top-running-status" class="running-status even"></div>
-
-  <label for="courseName"><strong>Course Name:</strong></label>
+  <label for="courseName">Course Name:</label>
   <input type="text" id="courseName" placeholder="e.g. Fox Hollow" />
-  <br><br>
 
-  <label for="roundDate"><strong>Date:</strong></label>
-  <input type="date" id="roundDate" />
-  <br><br>
+  <label for="roundDate">Date:</label>
+  <input type="text" id="roundDate" placeholder="mm / dd / yyyy" />
 
-  <label for="handicap"><strong>Handicap:</strong></label>
-  <input type="number" id="handicap" />
-  <br><br>
+  <label for="handicap">Handicap:</label>
+  <input type="text" id="handicap" />
 
-  <div id="stat-selector">
-    <strong>Select Stats to Track:</strong><br>
-    <label><input type="checkbox" value="score" checked /> Score</label>
-    <label><input type="checkbox" value="putts" checked /> Putts</label>
-    <label><input type="checkbox" value="gir" checked /> GIR</label>
-    <label><input type="checkbox" value="fairway" checked /> Fairway</label>
-    <br><br>
-<button id="start-round">Start Round</button>
+  <fieldset id="stat-selector">
+    <legend>Select Stats to Track:</legend>
+    <label><input type="checkbox" value="Score" /> Score</label>
+    <label><input type="checkbox" value="Putts" /> Putts</label>
+    <label><input type="checkbox" value="GIR" /> GIR</label>
+    <label><input type="checkbox" value="Fairway" /> Fairway</label>
+  </fieldset>
 
+  <button id="start-round">Start Round</button>
 
-  </div>
+  <div id="top-running-status"></div>
+  <div id="hole-view"></div>
 
-  <section id="hole-view"></section>
-  <section id="summary-block"></section>
-  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const startButton = document.getElementById("start-round");
+      const statusBlock = document.getElementById("top-running-status");
+      const holeView = document.getElementById("hole-view");
+
+      if (!startButton || !statusBlock || !holeView) {
+        alert("Critical elements missing. Cannot start round.");
+        return;
+      }
+
+      startButton.addEventListener("click", function () {
+        const courseName = document.getElementById("courseName")?.value || "Unnamed Course";
+        const roundDate = document.getElementById("roundDate")?.value || "Unknown Date";
+        const handicap = document.getElementById("handicap")?.value || "N/A";
+
+        const selectedStats = Array.from(
+          document.querySelectorAll("#stat-selector input[type='checkbox']:checked")
+        ).map((checkbox) => checkbox.value);
+
+        const roundData = {
+          courseName,
+          roundDate,
+          handicap,
+          selectedStats,
+        };
+
+        statusBlock.textContent = `✅ Round started at ${courseName} on ${roundDate}`;
+        holeView.innerHTML = `<p>Tracking started. First hole ready.</p>`;
+      });
+    });
+  </script>
 </body>
 </html>
